@@ -1,0 +1,34 @@
+{
+    "name": "soapbox/signed-requests",
+    "description": "A wrapper to add the ability to accept signed requests to a Laravel project.",
+    "keywords": ["laravel", "rollout"],
+    "authors": [
+        {
+            "name": "Jaspaul Bola",
+            "email": "jaspaul.b@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.1",
+        "mockery/mockery": "^0.9.9",
+        "phpunit/phpunit": "^6.0",
+        "squizlabs/php_codesniffer": "^2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "SoapBox\\SignedRequests\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
