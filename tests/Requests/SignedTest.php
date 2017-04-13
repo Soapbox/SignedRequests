@@ -153,8 +153,8 @@ class SignedTest extends TestCase
     {
         $request = $this->makeSignedRequest([
             'HTTP_ALGORITHM' => 'sha256',
-            'HTTP_SIGNATURE' => 'bd7affe8a72348b174610402219c16543165a188cba30e1d49062809a6d99b97'
-        ], "{'payload': 'payload'}");
+            'HTTP_SIGNATURE' => '75e1587919519036454cd1def16befd02ea12a76ac007aebe388c2c029a1f46d'
+        ], "{\"payload\": \"payload\"}");
         $request->setAlgorithmHeader('ALGORITHM')
             ->setSignatureHeader('SIGNATURE');
         $this->assertTrue($request->isValid("key"));
