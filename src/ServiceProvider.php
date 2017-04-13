@@ -24,7 +24,7 @@ class ServiceProvider extends IlluminateServiceProvider
     protected function publishConfigurations()
     {
         $this->publishes([
-            __DIR__.'../resources/config/signed-requests.php' => config_path('signed-requests.php'),
+            __DIR__.'/../resources/config/signed-requests.php' => config_path('signed-requests.php'),
         ]);
     }
 }
