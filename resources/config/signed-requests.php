@@ -10,8 +10,8 @@ array [
     | look for the signature and algorithm respectively.
     */
     'headers' => [
-        'signature' => 'X-Signature',
-        'algorithm' => 'X-Algorithm'
+        'signature' => env('SIGNED_REQUEST_SIGNATURE_HEADER', 'X-Signature'),
+        'algorithm' => env('SIGNED_REQUEST_ALGORITHM_HEADER', 'X-Algorithm')
     ],
 
     /*
