@@ -2,6 +2,7 @@
     "name": "soapbox/signed-requests",
     "description": "A wrapper to add the ability to accept signed requests to a Laravel project.",
     "keywords": ["laravel", "signed", "requests", "signed-requests"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Jaspaul Bola",
