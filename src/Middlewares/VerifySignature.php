@@ -3,6 +3,7 @@
 namespace SoapBox\SignedRequests\Middlewares;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Config\Repository;
 use SoapBox\SignedRequests\Requests\Signed;
 use SoapBox\SignedRequests\Exceptions\InvalidSignatureException;
@@ -36,20 +37,22 @@ class VerifySignature
      * @throws \SoapBox\SignedRequests\Exceptions\InvalidSignatureException
      *         Thrown when the signature of the request is not valid.
      *
-     * @param  \SoapBox\SignedRequests\Requests\Signed $request
-     *         An instance of the signed request.
+     * @param  \Illuminate\Http\Request $request
+     *         An instance of the request.
      * @param  \Closure $next
      *         A callback function of where to go next.
      *
      * @return mixed
      */
-    public function handle(Signed $request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        $request
+        $signed = new Signed($request);
+
+        $signed
             ->setSignatureHeader($this->configurations->get('signed-requests.headers.signature'))
             ->setAlgorithmHeader($this->configurations->get('signed-requests.headers.algorithm'));
 
-        if (!$request->isValid($this->configurations->get('signed-requests.key'))) {
+        if (!$signed->isValid($this->configurations->get('signed-requests.key'))) {
             throw new InvalidSignatureException();
         }
 
