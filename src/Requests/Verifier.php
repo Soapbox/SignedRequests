@@ -5,7 +5,7 @@ namespace SoapBox\SignedRequests\Requests;
 use Illuminate\Http\Request;
 use SoapBox\SignedRequests\Signature;
 
-class Signed extends Request
+class Verifier
 {
     /**
      * The header that holds the signature.
@@ -22,15 +22,22 @@ class Signed extends Request
     protected $algorithmHeader;
 
     /**
+     * The underlying request that has the signature to validate.
+     *
+     * @var \Illluminate\Http\Request
+     */
+    protected $request;
+
+    /**
      * Sets the local header key for locating the signature to the provided key.
      *
      * @param string $header
      *        The header key where the signature is located.
      *
-     * @return \SoapBox\SignedRequests\Requests\Signed
+     * @return \SoapBox\SignedRequests\Requests\Verifier
      *         The updated instance to enable fluent access.
      */
-    public function setSignatureHeader(string $header) : Signed
+    public function setSignatureHeader(string $header) : Verifier
     {
         $this->signatureHeader = $header;
         return $this;
@@ -42,10 +49,10 @@ class Signed extends Request
      * @param string $header
      *        The header key where the algorithm is located.
      *
-     * @return \SoapBox\SignedRequests\Requests\Signed
+     * @return \SoapBox\SignedRequests\Requests\Verifier
      *         The updated instance of to enable fluent access.
      */
-    public function setAlgorithmHeader(string $header) : Signed
+    public function setAlgorithmHeader(string $header) : Verifier
     {
         $this->algorithmHeader = $header;
         return $this;
@@ -74,6 +81,48 @@ class Signed extends Request
     }
 
     /**
+     * Used to wrap the existing request so we can verify the signature.
+     *
+     * @param \Illuminate\Http\Request $request
+     *        The request to be verified.
+     */
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * Forward calls to the underlying request so we can use this object like a
+     * request.
+     *
+     * @param string $method
+     *        The method to call on the underlying request.
+     * @param mixed $parameters
+     *        The parameters to send to the method on the request.
+     *
+     * @return mixed
+     *         Returns the results of the calls on the parent.
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->request->$method(...$parameters);
+    }
+
+    /**
+     * Forward calls to parameters to the request.
+     *
+     * @param string $key
+     *        The name of the property we're attempting to access.
+     *
+     * @return mixed
+     *         The value of the property on the request.
+     */
+    public function __get($key)
+    {
+        return $this->request->$key;
+    }
+
+    /**
      * Returns the request body content, and handles unescaping slashes for
      * json content.
      *
@@ -87,7 +136,7 @@ class Signed extends Request
      */
     public function getContent($asResource = false)
     {
-        $content = parent::getContent($asResource);
+        $content = $this->request->getContent($asResource);
 
         json_decode($content);
 

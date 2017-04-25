@@ -4,6 +4,8 @@ namespace Tests\Middlewares;
 
 use Mockery;
 use Tests\TestCase;
+use Illuminate\Http\Request;
+use SoapBox\SignedRequests\Signature;
 use Illuminate\Contracts\Config\Repository;
 use SoapBox\SignedRequests\Requests\Signed;
 use SoapBox\SignedRequests\Middlewares\VerifySignature;
@@ -59,12 +61,7 @@ class VerifySignatureTest extends TestCase
             ->with('signed-requests.key')
             ->andReturn('key');
 
-        $request = new class() extends Signed {
-            public function isValid(string $key) : bool
-            {
-                return false;
-            }
-        };
+        $request = new Request();
 
         $this->middleware->handle($request, function () { });
     }
@@ -76,22 +73,27 @@ class VerifySignatureTest extends TestCase
     {
         $this->configurations->shouldReceive('get')
             ->with('signed-requests.headers.signature')
-            ->andReturn('HTTP_SIGNATURE');
+            ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
             ->with('signed-requests.headers.algorithm')
-            ->andReturn('HTTP_ALGORITHM');
+            ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
             ->with('signed-requests.key')
             ->andReturn('key');
 
-        $request = new class() extends Signed {
-            public function isValid(string $key) : bool
-            {
-                return true;
-            }
-        };
+        $query = [];
+        $request = [];
+        $attributes = [];
+        $cookies = [];
+        $files = [];
+        $server = [
+            'HTTP_SIGNATURE' => hash_hmac('sha256', 'a', 'key'),
+            'HTTP_ALGORITHM' => 'sha256'
+        ];
+
+        $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
 
         $this->middleware->handle($request, function () {
             // This should be called.
