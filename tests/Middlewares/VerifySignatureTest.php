@@ -4,6 +4,7 @@ namespace Tests\Middlewares;
 
 use Mockery;
 use Tests\TestCase;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Config\Repository;
 use SoapBox\SignedRequests\Requests\Signed;
 use SoapBox\SignedRequests\Middlewares\VerifySignature;
@@ -59,7 +60,7 @@ class VerifySignatureTest extends TestCase
             ->with('signed-requests.key')
             ->andReturn('key');
 
-        $request = new class() extends Signed {
+        $request = new class(new Request()) extends Signed {
             public function isValid(string $key) : bool
             {
                 return false;
@@ -86,7 +87,7 @@ class VerifySignatureTest extends TestCase
             ->with('signed-requests.key')
             ->andReturn('key');
 
-        $request = new class() extends Signed {
+        $request = new class(new Request()) extends Signed {
             public function isValid(string $key) : bool
             {
                 return true;

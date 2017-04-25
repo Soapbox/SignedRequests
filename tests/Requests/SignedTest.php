@@ -11,10 +11,10 @@ class SignedTest extends TestCase
     /**
      * @test
      */
-    public function it_is_a_request()
+    public function it_can_be_constructed()
     {
-        $request = new Signed();
-        $this->assertInstanceOf(Request::class, $request);
+        $request = new Signed(new Request());
+        $this->assertInstanceOf(Signed::class, $request);
     }
 
     /**
@@ -22,7 +22,7 @@ class SignedTest extends TestCase
      */
     public function the_signature_header_key_can_be_set()
     {
-        $request = new class() extends Signed {
+        $request = new class(new Request()) extends Signed {
             public function getSignatureHeader()
             {
                 return $this->signatureHeader;
@@ -42,7 +42,7 @@ class SignedTest extends TestCase
      */
     public function the_algorithm_header_key_can_be_set()
     {
-        $request = new class() extends Signed {
+        $request = new class(new Request()) extends Signed {
             public function getAlgorithmHeader()
             {
                 return $this->algorithmHeader;
@@ -77,7 +77,9 @@ class SignedTest extends TestCase
         $files = [];
         $server = $headers;
 
-        return new Signed($query, $request, $attributes, $cookies, $files, $server, $content);
+        $request = new Request($query, $request, $attributes, $cookies, $files, $server, $content);
+
+        return new Signed($request);
     }
 
     /**
