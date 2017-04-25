@@ -5,7 +5,7 @@ namespace SoapBox\SignedRequests\Requests;
 use Illuminate\Http\Request;
 use SoapBox\SignedRequests\Signature;
 
-class Signed
+class Verifier
 {
     /**
      * The header that holds the signature.
@@ -34,10 +34,10 @@ class Signed
      * @param string $header
      *        The header key where the signature is located.
      *
-     * @return \SoapBox\SignedRequests\Requests\Signed
+     * @return \SoapBox\SignedRequests\Requests\Verifier
      *         The updated instance to enable fluent access.
      */
-    public function setSignatureHeader(string $header) : Signed
+    public function setSignatureHeader(string $header) : Verifier
     {
         $this->signatureHeader = $header;
         return $this;
@@ -49,10 +49,10 @@ class Signed
      * @param string $header
      *        The header key where the algorithm is located.
      *
-     * @return \SoapBox\SignedRequests\Requests\Signed
+     * @return \SoapBox\SignedRequests\Requests\Verifier
      *         The updated instance of to enable fluent access.
      */
-    public function setAlgorithmHeader(string $header) : Signed
+    public function setAlgorithmHeader(string $header) : Verifier
     {
         $this->algorithmHeader = $header;
         return $this;

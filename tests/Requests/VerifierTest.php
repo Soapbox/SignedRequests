@@ -4,17 +4,17 @@ namespace Tests\Requests;
 
 use Tests\TestCase;
 use Illuminate\Http\Request;
-use SoapBox\SignedRequests\Requests\Signed;
+use SoapBox\SignedRequests\Requests\Verifier;
 
-class SignedTest extends TestCase
+class VerifierTest extends TestCase
 {
     /**
      * @test
      */
     public function it_can_be_constructed()
     {
-        $request = new Signed(new Request());
-        $this->assertInstanceOf(Signed::class, $request);
+        $request = new Verifier(new Request());
+        $this->assertInstanceOf(Verifier::class, $request);
     }
 
     /**
@@ -22,7 +22,7 @@ class SignedTest extends TestCase
      */
     public function the_signature_header_key_can_be_set()
     {
-        $request = new class(new Request()) extends Signed {
+        $request = new class(new Request()) extends Verifier {
             public function getSignatureHeader()
             {
                 return $this->signatureHeader;
@@ -42,7 +42,7 @@ class SignedTest extends TestCase
      */
     public function the_algorithm_header_key_can_be_set()
     {
-        $request = new class(new Request()) extends Signed {
+        $request = new class(new Request()) extends Verifier {
             public function getAlgorithmHeader()
             {
                 return $this->algorithmHeader;
@@ -58,17 +58,17 @@ class SignedTest extends TestCase
     }
 
     /**
-     * A test helper to generate a signed request.
+     * A test helper to generate a Signed request.
      *
      * @param  array $headers
      *         The request headers we'd like to include.
      * @param  string $content
      *         The content of the request.
      *
-     * @return \SoapBox\SignedRequests\Requests\Signed
+     * @return \SoapBox\SignedRequests\Requests\Verifier
      *         A configured signed request.
      */
-    protected function makeSignedRequest(array $headers = [], string $content = null) : Signed
+    protected function makeSignedRequest(array $headers = [], string $content = null) : Verifier
     {
         $query = [];
         $request = [];
@@ -79,7 +79,7 @@ class SignedTest extends TestCase
 
         $request = new Request($query, $request, $attributes, $cookies, $files, $server, $content);
 
-        return new Signed($request);
+        return new Verifier($request);
     }
 
     /**

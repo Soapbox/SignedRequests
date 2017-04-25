@@ -5,7 +5,7 @@ namespace SoapBox\SignedRequests\Middlewares;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Config\Repository;
-use SoapBox\SignedRequests\Requests\Signed;
+use SoapBox\SignedRequests\Requests\Verifier;
 use SoapBox\SignedRequests\Exceptions\InvalidSignatureException;
 
 class VerifySignature
@@ -46,7 +46,7 @@ class VerifySignature
      */
     public function handle(Request $request, Closure $next)
     {
-        $signed = new Signed($request);
+        $signed = new Verifier($request);
 
         $signed
             ->setSignatureHeader($this->configurations->get('signed-requests.headers.signature'))
