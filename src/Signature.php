@@ -47,4 +47,15 @@ class Signature
 
         return false;
     }
+
+    /**
+     * Returns the generated signature string.
+     *
+     * @return string
+     *         The signature.
+     */
+    public function __toString() : string
+    {
+        return (string) $this->signature;
+    }
 }
