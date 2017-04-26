@@ -41,10 +41,13 @@ class Payload
     {
         $id = isset($this->request->getHeader('X-SIGNED-ID')[0]) ?
             $this->request->getHeader('X-SIGNED-ID')[0] : '';
+        $timestamp = isset($this->request->getHeader('X-SIGNED-TIMESTAMP')[0]) ?
+            $this->request->getHeader('X-SIGNED-TIMESTAMP')[0] : '';
 
         return json_encode([
             'id' => (string) $id,
             'method' => $this->request->getMethod(),
+            'timestamp' => $timestamp,
             'uri' => (string) $this->request->getUri(),
             'content' => $this->request->getBody()
         ], JSON_UNESCAPED_SLASHES);
@@ -62,10 +65,12 @@ class Payload
     protected function generateFromIlluminateRequest(IlluminateRequest $request) : string
     {
         $id = $this->request->headers->get('X-SIGNED-ID', '');
+        $timestamp = $this->request->headers->get('X-SIGNED-TIMESTAMP', '');
 
         return json_encode([
             'id' => (string) $id,
             'method' => $this->request->getMethod(),
+            'timestamp' => $timestamp,
             'uri' => (string) $this->request->fullUrl(),
             'content' => $this->request->getContent()
         ], JSON_UNESCAPED_SLASHES);

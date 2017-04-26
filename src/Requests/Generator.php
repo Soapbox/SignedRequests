@@ -2,6 +2,7 @@
 
 namespace SoapBox\SignedRequests\Requests;
 
+use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
 use GuzzleHttp\Psr7\Request;
 use SoapBox\SignedRequests\Signature;
@@ -47,6 +48,7 @@ class Generator
         $key = $this->repository->get('signed-requests.key');
 
         $request = $request->withHeader('X-SIGNED-ID', (string) Uuid::uuid4());
+        $request = $request->withHeader('X-SIGNED-TIMESTAMP', (string) Carbon::now());
 
         $signature = new Signature(new Payload($request), $algorithm, $key);
 
