@@ -3,7 +3,10 @@
 namespace Tests\Requests;
 
 use Tests\TestCase;
+use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
+use SoapBox\SignedRequests\Signature;
+use SoapBox\SignedRequests\Requests\Payload;
 use SoapBox\SignedRequests\Requests\Verifier;
 
 class VerifierTest extends TestCase
@@ -22,6 +25,7 @@ class VerifierTest extends TestCase
      */
     public function the_signature_header_key_can_be_set()
     {
+        $request =
         $request = new class(new Request()) extends Verifier {
             public function getSignatureHeader()
             {
@@ -68,16 +72,26 @@ class VerifierTest extends TestCase
      * @return \SoapBox\SignedRequests\Requests\Verifier
      *         A configured signed request.
      */
-    protected function makeSignedRequest(array $headers = [], string $content = null) : Verifier
+    protected function makeSignedRequest($id, array $headers = [], string $content = null) : Verifier
     {
-        $query = [];
-        $request = [];
-        $attributes = [];
+        $uri = 'https://localhost';
+        $method = 'GET';
+        $parameters = [];
         $cookies = [];
         $files = [];
-        $server = $headers;
+        $server = array_merge([
+            'HTTP_X-SIGNED-ID' => $id
+        ], $headers);
 
-        $request = new Request($query, $request, $attributes, $cookies, $files, $server, $content);
+        $request = Request::create(
+            $uri,
+            $method,
+            $parameters,
+            $cookies,
+            $files,
+            $server,
+            $content
+        );
 
         return new Verifier($request);
     }
@@ -87,9 +101,11 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_invalid_if_the_signature_header_key_is_not_set()
     {
-        $request = $this->makeSignedRequest([
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
             'HTTP_ALGORITHM' => 'sha256',
-            'HTTP_SIGNATURE' => '5d98b45c90a207fa998ce639fea6f02ecc8cc3f36fef81d694fb856b4d0a28ca'
+            'HTTP_SIGNATURE' => '182a082fb62f56f0c9df13bb3d7e478e9384515806fcfb2802e3fe88b3cb1e92'
         ], "payload");
         $request->setAlgorithmHeader('ALGORITHM');
         $this->assertFalse($request->isValid("key"));
@@ -100,9 +116,11 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_invalid_if_the_algorithm_header_key_is_not_set()
     {
-        $request = $this->makeSignedRequest([
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
             'HTTP_ALGORITHM' => 'sha256',
-            'HTTP_SIGNATURE' => '5d98b45c90a207fa998ce639fea6f02ecc8cc3f36fef81d694fb856b4d0a28ca'
+            'HTTP_SIGNATURE' => '182a082fb62f56f0c9df13bb3d7e478e9384515806fcfb2802e3fe88b3cb1e92'
         ], "payload");
         $request->setSignatureHeader('SIGNATURE');
         $this->assertFalse($request->isValid("key"));
@@ -113,7 +131,9 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_invalid_if_the_signature_header_is_not_set_on_the_request()
     {
-        $request = $this->makeSignedRequest([
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
             'HTTP_ALGORITHM' => 'sha256'
         ], "payload");
         $request->setAlgorithmHeader('ALGORITHM')
@@ -126,8 +146,10 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_invalid_if_the_algorithm_header_is_not_set_on_the_request()
     {
-        $request = $this->makeSignedRequest([
-            'HTTP_SIGNATURE' => '5d98b45c90a207fa998ce639fea6f02ecc8cc3f36fef81d694fb856b4d0a28ca'
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
+            'HTTP_SIGNATURE' => '182a082fb62f56f0c9df13bb3d7e478e9384515806fcfb2802e3fe88b3cb1e92'
         ], "payload");
         $request->setAlgorithmHeader('ALGORITHM')
             ->setSignatureHeader('SIGNATURE');
@@ -139,9 +161,11 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_valid_if_the_signature_matches_the_signature_generated_with_the_request()
     {
-        $request = $this->makeSignedRequest([
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
             'HTTP_ALGORITHM' => 'sha256',
-            'HTTP_SIGNATURE' => '5d98b45c90a207fa998ce639fea6f02ecc8cc3f36fef81d694fb856b4d0a28ca'
+            'HTTP_SIGNATURE' => '182a082fb62f56f0c9df13bb3d7e478e9384515806fcfb2802e3fe88b3cb1e92'
         ], "payload");
         $request->setAlgorithmHeader('ALGORITHM')
             ->setSignatureHeader('SIGNATURE');
@@ -153,9 +177,11 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_valid_if_the_signature_matches_the_signature_generated_with_the_request_with_json_content()
     {
-        $request = $this->makeSignedRequest([
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
             'HTTP_ALGORITHM' => 'sha256',
-            'HTTP_SIGNATURE' => '75e1587919519036454cd1def16befd02ea12a76ac007aebe388c2c029a1f46d'
+            'HTTP_SIGNATURE' => '935ff9e99c8f66c538332fa558a9132b6ec7b04ad018e88571024c1f8af8e9fc'
         ], "{\"payload\": \"payload\"}");
         $request->setAlgorithmHeader('ALGORITHM')
             ->setSignatureHeader('SIGNATURE');

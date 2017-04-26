@@ -4,6 +4,7 @@ namespace SoapBox\SignedRequests\Requests;
 
 use Illuminate\Http\Request;
 use SoapBox\SignedRequests\Signature;
+use SoapBox\SignedRequests\Requests\Payload;
 
 class Verifier
 {
@@ -167,7 +168,7 @@ class Verifier
             return false;
         }
 
-        $signature = new Signature($this->getContent(), $this->getAlgorithm(), $key);
+        $signature = new Signature(new Payload($this->request), $this->getAlgorithm(), $key);
 
         return $signature->equals($this->getSignature());
     }

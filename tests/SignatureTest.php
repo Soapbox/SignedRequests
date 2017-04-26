@@ -93,4 +93,17 @@ class SignatureTest extends TestCase
 
         $this->assertFalse($signature->equals($fake));
     }
+
+    /**
+     * @test
+     */
+    public function it_can_be_cast_to_a_string()
+    {
+        $signature = new Signature("payload", "sha256", "key");
+
+        $this->assertEquals(
+            "5d98b45c90a207fa998ce639fea6f02ecc8cc3f36fef81d694fb856b4d0a28ca",
+            (string) $signature
+        );
+    }
 }
