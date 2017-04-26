@@ -15,8 +15,8 @@ return [
     | Allows the application to disable / enable request replay's
     |--------------------------------------------------------------------------
     |
-    | If set to false, requests will automatically expire after 5 minutes.
-    | During the 5 minute window, request id's will only be valid once.
+    | If set to false, request id's will only be accepted once within the
+    | configured tolerance window.
     */
     'allow-replays' => env('SIGNED_REQUEST_ALLOW_REPLAYS', false),
 
@@ -42,5 +42,15 @@ return [
     | key is expected from the environment. You can change this behaviour,
     | however it is not recommended.
     */
-    'key' => env('SIGNED_REQUEST_KEY', 'key')
+    'key' => env('SIGNED_REQUEST_KEY', 'key'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allows a variance in time between the signing and verifiy servers
+    |--------------------------------------------------------------------------
+    |
+    | This defines the number of seconds a request will be considered for
+    | processing.
+    */
+    'tolerance' => env('SIGNED_REQUEST_TOLERANCE_SECONDS', 60)
 ];
