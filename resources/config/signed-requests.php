@@ -6,9 +6,19 @@ return [
     | The algorithm to sign the request with
     |--------------------------------------------------------------------------
     |
-    | This is the algorithm we'll use to sign the
+    | This is the algorithm we'll use to sign the request.
     */
     'algorithm' => env('SIGNED_REQUEST_ALGORITHM', 'sha256'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allows the application to disable / enable request replay's
+    |--------------------------------------------------------------------------
+    |
+    | If set to false, requests will automatically expire after 5 minutes.
+    | During the 5 minute window, request id's will only be valid once.
+    */
+    'allow-replays' => env('SIGNED_REQUEST_ALLOW_REPLAYS', false),
 
     /*
     |--------------------------------------------------------------------------
