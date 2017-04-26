@@ -44,7 +44,7 @@ class Payload
             'method' => $this->request->getMethod(),
             'uri' => (string) $this->request->getUri(),
             'content' => $this->request->getBody()
-        ]);
+        ], JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -65,7 +65,7 @@ class Payload
             'method' => $this->request->getMethod(),
             'uri' => (string) $this->request->fullUrl(),
             'content' => $this->request->getContent()
-        ]);
+        ], JSON_UNESCAPED_SLASHES);
     }
 
     /**

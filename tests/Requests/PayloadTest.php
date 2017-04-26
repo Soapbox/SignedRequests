@@ -27,7 +27,7 @@ class PayloadTest extends TestCase
             'method' => $method,
             'uri' => $uri,
             'content' => $request->getBody()
-        ]);
+        ], JSON_UNESCAPED_SLASHES);
 
         $this->assertEquals($expected, (string) new Payload($request));
     }
@@ -64,7 +64,7 @@ class PayloadTest extends TestCase
             'method' => $method,
             'uri' => $uri,
             'content' => $request->getContent()
-        ]);
+        ], JSON_UNESCAPED_SLASHES);
 
         $this->assertEquals($expected, (string) new Payload($request));
     }

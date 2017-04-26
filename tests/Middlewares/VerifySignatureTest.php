@@ -4,10 +4,13 @@ namespace Tests\Middlewares;
 
 use Mockery;
 use Tests\TestCase;
+use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use SoapBox\SignedRequests\Signature;
 use Illuminate\Contracts\Config\Repository;
 use SoapBox\SignedRequests\Requests\Signed;
+use SoapBox\SignedRequests\Requests\Payload;
+use SoapBox\SignedRequests\Requests\Generator;
 use SoapBox\SignedRequests\Middlewares\VerifySignature;
 
 class VerifySignatureTest extends TestCase
@@ -71,6 +74,8 @@ class VerifySignatureTest extends TestCase
      */
     public function it_should_call_our_callback_if_the_request_is_valid()
     {
+        $id = (string) Uuid::uuid4();
+
         $this->configurations->shouldReceive('get')
             ->with('signed-requests.headers.signature')
             ->andReturn('signature');
@@ -89,11 +94,12 @@ class VerifySignatureTest extends TestCase
         $cookies = [];
         $files = [];
         $server = [
-            'HTTP_SIGNATURE' => hash_hmac('sha256', 'a', 'key'),
+            'HTTP_X-SIGNED-ID' => $id,
             'HTTP_ALGORITHM' => 'sha256'
         ];
 
         $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
+        $request->headers->set('signature', (string) new Signature(new Payload($request), 'sha256', 'key'));
 
         $this->middleware->handle($request, function () {
             // This should be called.
