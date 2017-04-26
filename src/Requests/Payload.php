@@ -8,17 +8,20 @@ use Illuminate\Http\Request as IlluminateRequest;
 class Payload
 {
     /**
-     * The request.
+     * A request object. Currently both \GuzzleHttp\Psr7\Request and
+     * \Illuminate\Http\Request are supported.
      *
-     * @var \GuzzleHttp\Psr7\Request
+     * @var mixed
      */
     private $request;
 
     /**
      * Set's the local request to extract a payload from.
      *
-     * @param \GuzzleHttp\Psr7\Request $request
-     *        The request to extract a payload from.
+     * @param mixed $request
+     *        The request to extract a payload from. Currently both
+     *        \GuzzleHttp\Psr7\Request and \Illuminate\Http\Request are
+     *        supported.
      */
     public function __construct($request)
     {
