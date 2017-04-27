@@ -17,7 +17,7 @@ class ExpiredRequestException extends Exception implements HttpExceptionInterfac
     const MESSAGE = 'The provided request has expired';
 
     /**
-     * Provides a default error message for an invalid signature.
+     * Provides a default error message for an expired request.
      *
      * @param string $message
      *        A customizable error message.
