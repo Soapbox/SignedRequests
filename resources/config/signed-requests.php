@@ -6,9 +6,18 @@ return [
     | The algorithm to sign the request with
     |--------------------------------------------------------------------------
     |
-    | This is the algorithm we'll use to sign the
+    | This is the algorithm we'll use to sign the request.
     */
     'algorithm' => env('SIGNED_REQUEST_ALGORITHM', 'sha256'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | The prefix to use for all of our cache values
+    |--------------------------------------------------------------------------
+    |
+    | This is the prefix we'll use for all of our keys.
+    */
+    'cache-prefix' => env('SIGNED_REQUEST_CACHE_PREFIX', 'signed-requests'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,5 +41,19 @@ return [
     | key is expected from the environment. You can change this behaviour,
     | however it is not recommended.
     */
-    'key' => env('SIGNED_REQUEST_KEY', 'key')
+    'key' => env('SIGNED_REQUEST_KEY', 'key'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allows the management and tolerance of request replay's
+    |--------------------------------------------------------------------------
+    |
+    | This allows you to configure if the middleware should prevent the same
+    | request being replayed to your application, and adjust the tolerance
+    | for request expiry.
+    */
+    'request-replay' => [
+        'allow' => env('SIGNED_REQUEST_ALLOW_REPLAYS', false),
+        'tolerance' => env('SIGNED_REQUEST_TOLERANCE_SECONDS', 30)
+    ],
 ];

@@ -2,6 +2,7 @@
 
 namespace Tests\Requests;
 
+use Carbon\Carbon;
 use Tests\TestCase;
 use Ramsey\Uuid\Uuid;
 use SoapBox\SignedRequests\Requests\Payload;
@@ -15,16 +16,20 @@ class PayloadTest extends TestCase
      */
     public function it_translates_a_guzzle_request_to_a_json_encoded_string()
     {
+        $now = (string) Carbon::now();
+
         $method = 'GET';
         $uri = 'https://localhost';
         $id = Uuid::uuid4();
 
         $request = (new GuzzleRequest('GET', 'https://localhost'))
-            ->withHeader('X-SIGNED-ID', $id);
+            ->withHeader('X-SIGNED-ID', $id)
+            ->withHeader('X-SIGNED-TIMESTAMP', $now);
 
         $expected = json_encode([
             'id' => $id,
             'method' => $method,
+            'timestamp' => $now,
             'uri' => $uri,
             'content' => $request->getBody()
         ], JSON_UNESCAPED_SLASHES);
@@ -37,6 +42,7 @@ class PayloadTest extends TestCase
      */
     public function it_translates_an_illuminate_request_to_a_json_encoded_string()
     {
+        $now = (string) Carbon::now();
         $id = (string) Uuid::uuid4();
 
         $uri = 'https://localhost';
@@ -45,7 +51,8 @@ class PayloadTest extends TestCase
         $cookies = [];
         $files = [];
         $server = [
-            'HTTP_X-SIGNED-ID' => $id
+            'HTTP_X-SIGNED-ID' => $id,
+            'HTTP_X-SIGNED-TIMESTAMP' => $now
         ];
         $content = null;
 
@@ -62,6 +69,7 @@ class PayloadTest extends TestCase
         $expected = json_encode([
             'id' => $id,
             'method' => $method,
+            'timestamp' => $now,
             'uri' => $uri,
             'content' => $request->getContent()
         ], JSON_UNESCAPED_SLASHES);
