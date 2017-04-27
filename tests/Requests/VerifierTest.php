@@ -188,4 +188,94 @@ class VerifierTest extends TestCase
             ->setSignatureHeader('SIGNATURE');
         $this->assertTrue($request->isValid("key"));
     }
+
+    /**
+     * @test
+     */
+    public function is_expired_returns_true_if_no_timestamp_is_provided_on_the_request()
+    {
+        $tolerance = 60;
+
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [], "payload");
+
+        $this->assertTrue($request->isExpired($tolerance));
+    }
+
+    /**
+     * @test
+     */
+    public function is_expired_returns_false_if_the_timestamp_is_within_the_tolerance_window()
+    {
+        $tolerance = 60;
+
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
+            'HTTP_X-SIGNED-TIMESTAMP' => (string) Carbon::now()
+        ], "payload");
+
+        $this->assertFalse($request->isExpired($tolerance));
+    }
+
+    /**
+     * @test
+     */
+    public function is_expired_returns_true_if_the_timestamp_is_outside_the_tolerance_window()
+    {
+        $tolerance = 60;
+
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
+            'HTTP_X-SIGNED-TIMESTAMP' => (string) Carbon::now()->subSeconds($tolerance + 1)
+        ], "payload");
+
+        $this->assertTrue($request->isExpired($tolerance));
+    }
+
+    /**
+     * @test
+     */
+    public function is_expired_returns_false_if_the_timestamp_is_in_the_future_but_within_the_tolerance()
+    {
+        $tolerance = 60;
+
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
+            'HTTP_X-SIGNED-TIMESTAMP' => (string) Carbon::now()->addSeconds($tolerance - 1)
+        ], "payload");
+
+        $this->assertFalse($request->isExpired($tolerance));
+    }
+
+    /**
+     * @test
+     */
+    public function is_expired_returns_if_the_timestamp_is_in_the_future_outside_of_the_tolerance()
+    {
+        $tolerance = 60;
+
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [
+            'HTTP_X-SIGNED-TIMESTAMP' => (string) Carbon::now()->addSeconds($tolerance + 1)
+        ], "payload");
+
+        $this->assertTrue($request->isExpired($tolerance));
+    }
+
+    /**
+     * @test
+     */
+    public function get_id_should_return_the_x_signed_id_value()
+    {
+        $id = "363c60de-9024-4915-99a9-88d63167665e";
+
+        $request = $this->makeSignedRequest($id, [], '');
+
+        $this->assertSame($id, $request->getId());
+    }
 }

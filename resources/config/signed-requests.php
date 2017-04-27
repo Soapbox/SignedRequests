@@ -12,13 +12,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Allows the application to disable / enable request replay's
+    | The prefix to use for all of our cache values
     |--------------------------------------------------------------------------
     |
-    | If set to false, request id's will only be accepted once within the
-    | configured tolerance window.
+    | This is the prefix we'll use for all of our keys.
     */
-    'allow-replays' => env('SIGNED_REQUEST_ALLOW_REPLAYS', false),
+    'cache-prefix' => env('SIGNED_REQUEST_CACHE_PREFIX', 'signed-requests'),
 
     /*
     |--------------------------------------------------------------------------
@@ -46,11 +45,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Allows a variance in time between the signing and verifiy servers
+    | Allows the management and tolerance of request replay's
     |--------------------------------------------------------------------------
     |
-    | This defines the number of seconds a request will be considered for
-    | processing.
+    | This allows you to configure if the middleware should prevent the same
+    | request being replayed to your application, and adjust the tolerance
+    | for request expiry.
     */
-    'tolerance' => env('SIGNED_REQUEST_TOLERANCE_SECONDS', 60)
+    'request-replay' => [
+        'allow' => env('SIGNED_REQUEST_ALLOW_REPLAYS', false),
+        'tolerance' => env('SIGNED_REQUEST_TOLERANCE_SECONDS', 30)
+    ],
 ];

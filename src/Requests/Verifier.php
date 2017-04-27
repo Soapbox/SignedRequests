@@ -2,6 +2,7 @@
 
 namespace SoapBox\SignedRequests\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use SoapBox\SignedRequests\Signature;
 use SoapBox\SignedRequests\Requests\Payload;
@@ -171,5 +172,34 @@ class Verifier
         $signature = new Signature(new Payload($this->request), $this->getAlgorithm(), $key);
 
         return $signature->equals($this->getSignature());
+    }
+
+    /**
+     * Checks if this request was issued within tolerance seconds of now.
+     *
+     * @param int $tolerance
+     *        The number of seconds we'll tolerate for a request delay.
+     *
+     * @return bool
+     *         true if the request was issued within tolerance seconds, false
+     *         otherwise.
+     */
+    public function isExpired(int $tolerance) : bool
+    {
+        $issuedAt =
+            Carbon::parse($this->headers->get('X-SIGNED-TIMESTAMP', '1901-01-01 12:00:00'));
+
+        return Carbon::now()->diffInSeconds($issuedAt) > 60;
+    }
+
+    /**
+     * Returns the X-SIGNED-ID header value.
+     *
+     * @return string
+     *         The configured header.
+     */
+    public function getId() : string
+    {
+        return $this->headers->get('X-SIGNED-ID', '');
     }
 }
