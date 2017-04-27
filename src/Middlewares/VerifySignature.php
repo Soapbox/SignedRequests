@@ -73,7 +73,7 @@ class VerifySignature
 
         $tolerance = $this->configurations->get('signed-requests.request-replay.tolerance');
 
-        if (false == $this->configurations->get('signed-requests.request-replay.allow')) {
+        if (true !== $this->configurations->get('signed-requests.request-replay.allow')) {
             $isExpired = $signed->isExpired($tolerance);
 
             if ($isExpired || $this->cache->has($key)) {
