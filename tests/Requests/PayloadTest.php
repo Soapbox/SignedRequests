@@ -31,7 +31,7 @@ class PayloadTest extends TestCase
             'method' => $method,
             'timestamp' => $now,
             'uri' => $uri,
-            'content' => $request->getBody()
+            'content' => $request->getBody()->getContents()
         ], JSON_UNESCAPED_SLASHES);
 
         $this->assertEquals($expected, (string) new Payload($request));

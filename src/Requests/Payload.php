@@ -49,7 +49,7 @@ class Payload
             'method' => $this->request->getMethod(),
             'timestamp' => $timestamp,
             'uri' => (string) $this->request->getUri(),
-            'content' => $this->request->getBody()
+            'content' => $this->request->getBody()->getContents()
         ], JSON_UNESCAPED_SLASHES);
     }
 
