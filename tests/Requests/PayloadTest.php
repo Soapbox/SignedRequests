@@ -31,7 +31,33 @@ class PayloadTest extends TestCase
             'method' => $method,
             'timestamp' => $now,
             'uri' => $uri,
-            'content' => $request->getBody()
+            'content' => $request->getBody()->getContents()
+        ], JSON_UNESCAPED_SLASHES);
+
+        $this->assertEquals($expected, (string) new Payload($request));
+    }
+
+    /**
+     * @test
+     */
+    public function it_translates_a_guzzle_request_with_content_to_a_json_encoded_string()
+    {
+        $now = (string) Carbon::now();
+
+        $method = 'GET';
+        $uri = 'https://localhost';
+        $id = Uuid::uuid4();
+
+        $request = (new GuzzleRequest('GET', 'https://localhost', [], 'content'))
+            ->withHeader('X-SIGNED-ID', $id)
+            ->withHeader('X-SIGNED-TIMESTAMP', $now);
+
+        $expected = json_encode([
+            'id' => $id,
+            'method' => $method,
+            'timestamp' => $now,
+            'uri' => $uri,
+            'content' => 'content'
         ], JSON_UNESCAPED_SLASHES);
 
         $this->assertEquals($expected, (string) new Payload($request));

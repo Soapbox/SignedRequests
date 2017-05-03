@@ -2,8 +2,8 @@
 
 namespace SoapBox\SignedRequests\Requests;
 
-use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use Illuminate\Http\Request as IlluminateRequest;
+use Psr\Http\Message\RequestInterface as Psr7Request;
 
 class Payload
 {
@@ -31,13 +31,13 @@ class Payload
     /**
      * Returns the payload from a guzzle request.
      *
-     * @param \GuzzleHttp\Psr7\Request $request
+     * @param \Psr\Http\Message\RequestInterface $request
      *        An instance of the guzzle request to extract a payload from.
      *
      * @return string
      *         The payload.
      */
-    protected function generateFromGuzzleRequest(GuzzleRequest $request) : string
+    protected function generateFromPsr7Request(Psr7Request $request) : string
     {
         $id = isset($this->request->getHeader('X-SIGNED-ID')[0]) ?
             $this->request->getHeader('X-SIGNED-ID')[0] : '';
@@ -49,7 +49,7 @@ class Payload
             'method' => $this->request->getMethod(),
             'timestamp' => $timestamp,
             'uri' => (string) $this->request->getUri(),
-            'content' => $this->request->getBody()
+            'content' => $this->request->getBody()->getContents()
         ], JSON_UNESCAPED_SLASHES);
     }
 
@@ -84,8 +84,8 @@ class Payload
      */
     public function __toString() : string
     {
-        if ($this->request instanceof GuzzleRequest) {
-            return $this->generateFromGuzzleRequest($this->request);
+        if ($this->request instanceof Psr7Request) {
+            return $this->generateFromPsr7Request($this->request);
         }
 
         if ($this->request instanceof IlluminateRequest) {
