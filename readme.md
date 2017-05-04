@@ -25,7 +25,7 @@ Open `config/app.php` and register the required service provider above your appl
 ### Publish the Configuration
 
 ```php
-php artisan vendor:publish
+php artisan vendor:publish --provider 'SoapBox\SignedRequests\ServiceProvider'
 ```
 
 ### Configuring your Environment
