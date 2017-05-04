@@ -1,6 +1,6 @@
 <?php
 
-namespace SoapBox\SignedRequests\Middlewares;
+namespace SoapBox\SignedRequests\Middlewares\Laravel;
 
 use Closure;
 use Illuminate\Http\Request;
