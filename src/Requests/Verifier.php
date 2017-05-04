@@ -189,7 +189,7 @@ class Verifier
         $issuedAt =
             Carbon::parse($this->headers->get('X-SIGNED-TIMESTAMP', '1901-01-01 12:00:00'));
 
-        return Carbon::now()->diffInSeconds($issuedAt) > 60;
+        return Carbon::now()->diffInSeconds($issuedAt) > $tolerance;
     }
 
     /**

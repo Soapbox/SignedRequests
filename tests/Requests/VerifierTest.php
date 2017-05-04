@@ -194,7 +194,7 @@ class VerifierTest extends TestCase
      */
     public function is_expired_returns_true_if_no_timestamp_is_provided_on_the_request()
     {
-        $tolerance = 60;
+        $tolerance = 10;
 
         $id = "363c60de-9024-4915-99a9-88d63167665e";
 
@@ -208,7 +208,7 @@ class VerifierTest extends TestCase
      */
     public function is_expired_returns_false_if_the_timestamp_is_within_the_tolerance_window()
     {
-        $tolerance = 60;
+        $tolerance = 100;
 
         $id = "363c60de-9024-4915-99a9-88d63167665e";
 
@@ -224,7 +224,7 @@ class VerifierTest extends TestCase
      */
     public function is_expired_returns_true_if_the_timestamp_is_outside_the_tolerance_window()
     {
-        $tolerance = 60;
+        $tolerance = 1000;
 
         $id = "363c60de-9024-4915-99a9-88d63167665e";
 
@@ -240,7 +240,7 @@ class VerifierTest extends TestCase
      */
     public function is_expired_returns_false_if_the_timestamp_is_in_the_future_but_within_the_tolerance()
     {
-        $tolerance = 60;
+        $tolerance = 10000;
 
         $id = "363c60de-9024-4915-99a9-88d63167665e";
 
@@ -256,7 +256,7 @@ class VerifierTest extends TestCase
      */
     public function is_expired_returns_if_the_timestamp_is_in_the_future_outside_of_the_tolerance()
     {
-        $tolerance = 60;
+        $tolerance = 100000;
 
         $id = "363c60de-9024-4915-99a9-88d63167665e";
 
