@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Middlewares;
+namespace Tests\Middlewares\Laravel;
 
 use Mockery;
 use Carbon\Carbon;
@@ -13,15 +13,15 @@ use SoapBox\SignedRequests\Requests\Signed;
 use SoapBox\SignedRequests\Requests\Payload;
 use SoapBox\SignedRequests\Requests\Generator;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use SoapBox\SignedRequests\Middlewares\VerifySignature;
 use Illuminate\Contracts\Config\Repository as Configurations;
+use SoapBox\SignedRequests\Middlewares\Laravel\VerifySignature;
 
 class VerifySignatureTest extends TestCase
 {
     /**
      * An instance of the verify signature middleware we can use for testing.
      *
-     * @var \SoapBox\SignedRequests\Middlewares\VerifySignature
+     * @var \SoapBox\SignedRequests\Middlewares\Laravel\VerifySignature
      */
     protected $middleware;
 
