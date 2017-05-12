@@ -57,7 +57,7 @@ Each of the settings above allows for a different level of configuration.
 Signed Requests includes a middleware to validate the signature of a request for your automatically. To get started, add the following middleware to the `$routeMiddleware` property of your `app/Http/Kernel.php` file.
 
 ```php
-'verify-signature' => \SoapBox\SignedRequests\Middlewares\VerifySignature::class
+'verify-signature' => \SoapBox\SignedRequests\Middlewares\Laravel\VerifySignature::class
 ```
 
 ### Verify the Signature
