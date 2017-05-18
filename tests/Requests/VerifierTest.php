@@ -288,13 +288,13 @@ class VerifierTest extends TestCase
         {
             public function getContent($asResource = false)
             {
-                return '{';
+                return '"url":"http:\\/\\/google.com"';
             }
         };
 
         $verifier = new Verifier($request);
 
-        $this->assertSame('{', $verifier->getContent());
+        $this->assertSame('"url":"http:\\/\\/google.com"', $verifier->getContent());
     }
 
     /**
