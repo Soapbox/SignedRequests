@@ -4,6 +4,7 @@ namespace SoapBox\SignedRequests\Middlewares\Guzzle;
 
 use Psr\Http\Message\RequestInterface;
 use SoapBox\SignedRequests\Requests\Generator;
+use SoapBox\SignedRequests\Configurations\Configuration;
 
 class GenerateSignature
 {
@@ -15,14 +16,14 @@ class GenerateSignature
     protected $generator;
 
     /**
-     * Expect an instance of the generator so we can sign the request
+     * Expect a configuration to build our generator with.
      *
-     * @param \SoapBox\SignedRequests\Requests\Generator $generator
-     *        An instance of the signed request generator
+     * @param \SoapBox\SignedRequests\Configurations\Configuration $configuration
+     *        The configuration to use for generating signed requests.
      */
-    public function __construct(Generator $generator)
+    public function __construct(Configuration $configuration)
     {
-        $this->generator = $generator;
+        $this->generator = new Generator($configuration);
     }
 
     /**

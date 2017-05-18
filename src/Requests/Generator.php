@@ -8,26 +8,27 @@ use GuzzleHttp\Psr7\Request;
 use SoapBox\SignedRequests\Signature;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Contracts\Config\Repository;
+use SoapBox\SignedRequests\Configurations\Configuration;
 
 class Generator
 {
     /**
-     * An instance of the configuration repository.
+     * A configuration to use for generating signatures.
      *
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var \SoapBox\SignedRequests\Configurations\Configuration
      */
-    private $repository;
+    private $configuration;
 
     /**
      * Constructs our signed request generator with an instance of the
      * configurations.
      *
-     * @param \Illuminate\Contracts\Config\Repository $repository
-     *        A configuration repository.
+     * @param \SoapBox\SignedRequests\Configurations\Configuration $configuration
+     *        The configuration to use for generating the signed request.
      */
-    public function __construct(Repository $repository)
+    public function __construct(Configuration $configuration)
     {
-        $this->repository = $repository;
+        $this->configuration = $configuration;
     }
 
     /**
@@ -37,15 +38,15 @@ class Generator
      *        The request to sign.
      *
      * @return \GuzzleHttp\Psr7\Request
-     *         The request with an id, algorith, and signature.
+     *         The request with an id, algorithm, and signature.
      */
     public function sign(Request $request) : Request
     {
-        $algorithmHeader = $this->repository->get('signed-requests.headers.algorithm');
-        $signatureHeader = $this->repository->get('signed-requests.headers.signature');
+        $algorithmHeader = $this->configuration->getAlgorithmHeader();
+        $signatureHeader = $this->configuration->getSignatureHeader();
 
-        $algorithm = $this->repository->get('signed-requests.algorithm');
-        $key = $this->repository->get('signed-requests.key');
+        $algorithm = $this->configuration->getSigningAlgorithm();
+        $key = $this->configuration->getSigningKey();
 
         $request = $request->withHeader('X-SIGNED-ID', (string) Uuid::uuid4());
         $request = $request->withHeader('X-SIGNED-TIMESTAMP', (string) Carbon::now());

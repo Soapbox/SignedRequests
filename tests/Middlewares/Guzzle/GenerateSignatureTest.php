@@ -8,7 +8,9 @@ use GuzzleHttp\Psr7\Request;
 use Illuminate\Config\Repository;
 use Psr\Http\Message\RequestInterface;
 use SoapBox\SignedRequests\Requests\Generator;
+use SoapBox\SignedRequests\Configurations\Configuration;
 use SoapBox\SignedRequests\Middlewares\Guzzle\GenerateSignature;
+use SoapBox\SignedRequests\Configurations\RepositoryConfiguration;
 
 class GenerateSignatureTest extends TestCase
 {
@@ -17,7 +19,7 @@ class GenerateSignatureTest extends TestCase
      */
     public function it_can_be_constructed()
     {
-        $middleware = new GenerateSignature(new Generator(Mockery::mock(Repository::class)));
+        $middleware = new GenerateSignature(Mockery::mock(Configuration::class));
         $this->assertInstanceOf(GenerateSignature::class, $middleware);
     }
 
@@ -45,7 +47,7 @@ class GenerateSignatureTest extends TestCase
         $key = $configurations->shouldReceive('get')
             ->with('signed-requests.key')
             ->andReturn('bigsecretrighthereitellyouwhat');
-        $middleware = new GenerateSignature(new Generator($configurations));
+        $middleware = new GenerateSignature(new RepositoryConfiguration($configurations));
 
         $nextHandler = function (RequestInterface $request, array $options) {
             return $request;
