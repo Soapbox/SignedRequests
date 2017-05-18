@@ -11,7 +11,6 @@ use Illuminate\Cache\ArrayStore;
 use SoapBox\SignedRequests\Signature;
 use SoapBox\SignedRequests\Requests\Signed;
 use SoapBox\SignedRequests\Requests\Payload;
-use SoapBox\SignedRequests\Requests\Generator;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Configurations;
 use SoapBox\SignedRequests\Middlewares\Laravel\VerifySignature;

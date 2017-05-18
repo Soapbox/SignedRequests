@@ -4,7 +4,6 @@ namespace Tests\Requests;
 
 use Carbon\Carbon;
 use Tests\TestCase;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Http\Request;
 use SoapBox\SignedRequests\Signature;
 use SoapBox\SignedRequests\Requests\Payload;

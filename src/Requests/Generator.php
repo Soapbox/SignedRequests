@@ -6,8 +6,6 @@ use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
 use GuzzleHttp\Psr7\Request;
 use SoapBox\SignedRequests\Signature;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Contracts\Config\Repository;
 use SoapBox\SignedRequests\Configurations\Configuration;
 
 class Generator

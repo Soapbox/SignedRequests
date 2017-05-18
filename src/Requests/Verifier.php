@@ -5,7 +5,6 @@ namespace SoapBox\SignedRequests\Requests;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use SoapBox\SignedRequests\Signature;
-use SoapBox\SignedRequests\Requests\Payload;
 
 class Verifier
 {

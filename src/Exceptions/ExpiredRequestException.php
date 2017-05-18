@@ -3,7 +3,6 @@
 namespace SoapBox\SignedRequests\Exceptions;
 
 use Exception;
-use Throwable;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 

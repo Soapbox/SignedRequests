@@ -7,7 +7,6 @@ use Tests\TestCase;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Config\Repository;
 use Psr\Http\Message\RequestInterface;
-use SoapBox\SignedRequests\Requests\Generator;
 use SoapBox\SignedRequests\Configurations\Configuration;
 use SoapBox\SignedRequests\Middlewares\Guzzle\GenerateSignature;
 use SoapBox\SignedRequests\Configurations\RepositoryConfiguration;
