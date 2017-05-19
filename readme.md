@@ -1,5 +1,7 @@
 # Signed Requests
 
+[![Build Status](https://travis-ci.org/SoapBox/SignedRequests.svg?branch=master)](https://travis-ci.org/SoapBox/SignedRequests) [![Coverage Status](https://coveralls.io/repos/github/SoapBox/SignedRequests/badge.svg?branch=master)](https://coveralls.io/github/SoapBox/SignedRequests?branch=master) [![Code Climate](https://codeclimate.com/github/SoapBox/SignedRequests/badges/gpa.svg)](https://codeclimate.com/github/SoapBox/SignedRequests)
+
 A wrapper to add the ability to accept signed requests to a Laravel project.
 
 ## Installation
