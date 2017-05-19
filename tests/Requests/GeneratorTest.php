@@ -6,13 +6,13 @@ use Mockery;
 use Tests\TestCase;
 use GuzzleHttp\Psr7\Request;
 use SoapBox\SignedRequests\Signature;
-use Illuminate\Contracts\Config\Repository;
 use SoapBox\SignedRequests\Requests\Payload;
 use SoapBox\SignedRequests\Requests\Generator;
+use SoapBox\SignedRequests\Configurations\Configuration;
 
 class GeneratorTest extends TestCase
 {
-    private $repository;
+    private $configuration;
     private $generator;
 
     /**
@@ -20,26 +20,22 @@ class GeneratorTest extends TestCase
      */
     public function setup_a_local_generator()
     {
-        $this->repository = Mockery::mock(Repository::class);
+        $this->configuration = Mockery::mock(Configuration::class);
 
-        $this->repository
-            ->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+        $this->configuration
+            ->shouldReceive('getAlgorithmHeader')
             ->andReturn('X-ALGORITHM');
-        $this->repository
-            ->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+        $this->configuration
+            ->shouldReceive('getSignatureHeader')
             ->andReturn('X-SIGNATURE');
-        $this->repository
-            ->shouldReceive('get')
-            ->with('signed-requests.algorithm')
+        $this->configuration
+            ->shouldReceive('getSigningAlgorithm')
             ->andReturn('sha256');
-        $this->repository
-            ->shouldReceive('get')
-            ->with('signed-requests.key')
+        $this->configuration
+            ->shouldReceive('getSigningKey')
             ->andReturn('key');
 
-        $this->generator = new Generator($this->repository);
+        $this->generator = new Generator($this->configuration);
     }
 
     /**
