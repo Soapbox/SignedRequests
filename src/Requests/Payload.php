@@ -71,7 +71,7 @@ class Payload
             'id' => (string) $id,
             'method' => $this->request->getMethod(),
             'timestamp' => $timestamp,
-            'uri' => (string) $this->request->fullUrl(),
+            'uri' => (string) $this->request->fullUrlWithQuery([]),
             'content' => $this->request->getContent()
         ], JSON_UNESCAPED_SLASHES);
     }
