@@ -66,12 +66,13 @@ class Payload
     {
         $id = $this->request->headers->get('X-SIGNED-ID', '');
         $timestamp = $this->request->headers->get('X-SIGNED-TIMESTAMP', '');
+        $query = !empty($this->request->query()) ? '?' . http_build_query($this->request->query()) : '';
 
         return json_encode([
             'id' => (string) $id,
             'method' => $this->request->getMethod(),
             'timestamp' => $timestamp,
-            'uri' => (string) $this->request->fullUrlWithQuery([]),
+            'uri' => (string) $this->request->url() . $query,
             'content' => $this->request->getContent()
         ], JSON_UNESCAPED_SLASHES);
     }
