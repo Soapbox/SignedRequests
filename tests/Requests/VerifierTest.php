@@ -80,7 +80,7 @@ class VerifierTest extends TestCase
         $files = [];
         $server = array_merge([
             'HTTP_X-SIGNED-ID' => $id,
-            'HTTP_X-SIGNED-TIMESTAMP' => Carbon::parse('2017-10-10 12:00:00')
+            'HTTP_X-SIGNED-TIMESTAMP' => Carbon::parse('2017-10-10 12:00:00')->format('Y-m-d H:i:s.u')
         ], $headers);
 
         $request = Request::create(
@@ -283,8 +283,7 @@ class VerifierTest extends TestCase
      */
     public function get_content_returns_the_raw_content_if_it_is_not_valid_json()
     {
-        $request = new class() extends Request
-        {
+        $request = new class() extends Request {
             public function getContent($asResource = false)
             {
                 return '"url":"http:\\/\\/google.com"';
@@ -301,8 +300,7 @@ class VerifierTest extends TestCase
      */
     public function get_content_returns_the_content_from_the_request_without_escaping_the_slashes_if_the_content_is_valid_json()
     {
-        $request = new class() extends Request
-        {
+        $request = new class() extends Request {
             public function getContent($asResource = false)
             {
                 return '{"url":"http:\\/\\/google.com"}';
