@@ -50,7 +50,7 @@ class Payload
             'timestamp' => $timestamp,
             'uri' => (string) $this->request->getUri(),
             'content' => $this->request->getBody()->getContents()
-        ], JSON_UNESCAPED_SLASHES);
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**
