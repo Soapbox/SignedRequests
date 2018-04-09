@@ -46,7 +46,7 @@ class Payload
 
         return json_encode([
             'id' => (string) $id,
-            'method' => $this->request->getMethod(),
+            'method' => strtoupper($this->request->getMethod()),
             'timestamp' => $timestamp,
             'uri' => (string) $this->request->getUri(),
             'content' => $this->request->getBody()->getContents()
@@ -69,7 +69,7 @@ class Payload
 
         return json_encode([
             'id' => (string) $id,
-            'method' => $this->request->getMethod(),
+            'method' => strtoupper($this->request->getMethod()),
             'timestamp' => $timestamp,
             'uri' => (string) $this->request->fullUrl(),
             'content' => $this->request->getContent()
