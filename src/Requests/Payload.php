@@ -82,13 +82,28 @@ class Payload
         $id = $this->request->headers->get('X-SIGNED-ID', '');
         $timestamp = $this->request->headers->get('X-SIGNED-TIMESTAMP', '');
 
+        $string = json_decode((string) $this->request->getContent());
+
+        if (is_null($string)) {
+            return json_encode([
+                'id' => (string) $id,
+                'method' => strtoupper($this->request->getMethod()),
+                'timestamp' => $timestamp,
+                'uri' => rtrim((string) $this->request->fullUrl(), '/'),
+                'content' => (string) $this->request->getContent()
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+
         return json_encode([
-            'id' => (string) $id,
+            'id' => (string)$id,
             'method' => strtoupper($this->request->getMethod()),
             'timestamp' => $timestamp,
-            'uri' => (string) $this->request->fullUrl(),
-            'content' => $this->request->getContent()
-        ], JSON_UNESCAPED_SLASHES);
+            'uri' => rtrim((string) $this->request->fullUrl(), '/'),
+            'content' => json_encode(
+                json_decode((string) $this->request->getContent()),
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            )
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**

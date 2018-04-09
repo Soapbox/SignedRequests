@@ -241,4 +241,50 @@ class ClientTest extends TestCase
             ]
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_generates_a_signature_with_a_simple_json_get_payload()
+    {
+        Carbon::setTestNow('2001-01-01 00:00:00');
+        $this->expectUuid4('303103f5-3dca-4704-96ad-860717769ec9');
+
+        $uri = 'https://localhost';
+
+        $this->handler->expects('GET', $uri)
+            ->inspectRequest(function ($request) use ($uri) {
+                $this->assertTrue($request->hasHeader('Algorithm'));
+                $this->assertTrue($request->hasHeader('Signature'));
+                $this->assertSame(
+                    '939ada016b60aa267980a73f62e6dc583b03b35a2abf0dea5b054871d6c6a306',
+                    $request->getHeader('Signature')[0]
+                );
+            });
+
+        $this->client->get($uri, ['json' => ['payload' => 'payload']]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_generates_a_signature_with_a_simple_get_payload()
+    {
+        Carbon::setTestNow('2001-01-01 00:00:00');
+        $this->expectUuid4('303103f5-3dca-4704-96ad-860717769ec9');
+
+        $uri = 'https://localhost';
+
+        $this->handler->expects('GET', $uri)
+            ->inspectRequest(function ($request) use ($uri) {
+                $this->assertTrue($request->hasHeader('Algorithm'));
+                $this->assertTrue($request->hasHeader('Signature'));
+                $this->assertSame(
+                    '9feb58dfece796627b16f7865fc19ee6bfc5b231d49b12d83170d74d22bf9641',
+                    $request->getHeader('Signature')[0]
+                );
+            });
+
+        $this->client->get($uri, ['body' => 'payload']);
+    }
 }

@@ -80,7 +80,42 @@ class VerifierTest extends TestCase
         $files = [];
         $server = array_merge([
             'HTTP_X-SIGNED-ID' => $id,
-            'HTTP_X-SIGNED-TIMESTAMP' => Carbon::parse('2017-10-10 12:00:00')->format('Y-m-d H:i:s.u')
+            'HTTP_X-SIGNED-TIMESTAMP' => Carbon::parse('2017-10-10 12:00:00')->format('Y-m-d H:i:s')
+        ], $headers);
+
+        $request = Request::create(
+            $uri,
+            $method,
+            $parameters,
+            $cookies,
+            $files,
+            $server,
+            $content
+        );
+
+        return new Verifier($request);
+    }
+
+    /**
+     * A test helper to generate a Signed request.
+     *
+     * @param  array $headers
+     *         The request headers we'd like to include.
+     * @param  string $content
+     *         The content of the request.
+     *
+     * @return \SoapBox\SignedRequests\Requests\Verifier
+     *         A configured signed request.
+     */
+    protected function makeSignedPostRequest($id, array $headers = [], string $content = null, string $uri = 'https://localhost') : Verifier
+    {
+        $method = 'POST';
+        $parameters = [];
+        $cookies = [];
+        $files = [];
+        $server = array_merge([
+            'HTTP_X-SIGNED-ID' => $id,
+            'HTTP_X-SIGNED-TIMESTAMP' => Carbon::parse('2017-10-10 12:00:00')->format('Y-m-d H:i:s')
         ], $headers);
 
         $request = Request::create(
@@ -161,11 +196,12 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_valid_if_the_signature_matches_the_signature_generated_with_the_request()
     {
-        $id = "363c60de-9024-4915-99a9-88d63167665e";
+        $id = "303103f5-3dca-4704-96ad-860717769ec9";
 
         $request = $this->makeSignedRequest($id, [
             'HTTP_ALGORITHM' => 'sha256',
-            'HTTP_SIGNATURE' => '9c44bdc4bac17149f3aba3778d74a9e217a41446b723efc5c3c903c557ba466e'
+            'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+            'HTTP_SIGNATURE' => '9feb58dfece796627b16f7865fc19ee6bfc5b231d49b12d83170d74d22bf9641'
         ], "payload");
         $request->setAlgorithmHeader('ALGORITHM')
             ->setSignatureHeader('SIGNATURE');
@@ -177,11 +213,12 @@ class VerifierTest extends TestCase
      */
     public function a_signed_request_is_valid_if_the_signature_matches_the_signature_generated_with_the_request_with_json_content()
     {
-        $id = "363c60de-9024-4915-99a9-88d63167665e";
+        $id = "303103f5-3dca-4704-96ad-860717769ec9";
 
         $request = $this->makeSignedRequest($id, [
             'HTTP_ALGORITHM' => 'sha256',
-            'HTTP_SIGNATURE' => '60ec59a169fc1cc9373ed38f8b9783ba2ad5a6782945058d25898fab410927de'
+            'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+            'HTTP_SIGNATURE' => '939ada016b60aa267980a73f62e6dc583b03b35a2abf0dea5b054871d6c6a306'
         ], "{\"payload\": \"payload\"}");
         $request->setAlgorithmHeader('ALGORITHM')
             ->setSignatureHeader('SIGNATURE');
@@ -310,5 +347,275 @@ class VerifierTest extends TestCase
         $verifier = new Verifier($request);
 
         $this->assertSame('{"url":"http://google.com"}', $verifier->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_correctly_when_encoded_without_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => 'b9f912a4fc4b2952a48380579d3e4a1c55c0537ce583b3da7cc9f6c67fe4caa7',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => 'test'])
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_correctly_when_encoded_with_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => 'b9f912a4fc4b2952a48380579d3e4a1c55c0537ce583b3da7cc9f6c67fe4caa7',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => 'test'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_containing_a_ã_correctly_when_encoded_without_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => 'd35d92484222fce7e5c194381e5f53342caae6fa626cd61e3431bddc549b34e1',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => 'ã'])
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_containing_a_ã_correctly_when_encoded_with_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => 'd35d92484222fce7e5c194381e5f53342caae6fa626cd61e3431bddc549b34e1',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => 'ã'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_containing_a_好_correctly_when_encoded_without_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => '65ff94dce4894eb306a76ff0d397ec264b1c4980b57afbc3dd9526af242d239b',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => '好'])
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_containing_a_好_correctly_when_encoded_with_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => '65ff94dce4894eb306a76ff0d397ec264b1c4980b57afbc3dd9526af242d239b',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => '好'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_containing_a_uri_correctly_when_encoded_without_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => 'ebd68bfe7ed51c050fb92db098946cd21b7b23be6f682360a5e893840a1dc52f',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => 'https://localhost'])
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_simple_json_payload_containing_a_uri_correctly_when_encoded_with_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => 'ebd68bfe7ed51c050fb92db098946cd21b7b23be6f682360a5e893840a1dc52f',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(['test' => 'https://localhost'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_complex_json_payload_correctly_when_encoded_without_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => '0c3f0c81ba1fa3df9d3e0a1d72c4d491125153c0dea8355b6d48fe7ef1a4dacc',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(
+                [
+                    'users' => [
+                        ['id' => 1, 'name' => 'Chris Hayes', 'email' => 'hayes@soapboxhq.com'],
+                        ['id' => 2, 'name' => 'Jaspaul Bola', 'email' => 'jaspaul@soapboxhq.com'],
+                        ['id' => 3, 'name' => 'Mr Penã 💩', 'email' => 'Mr-Penã@soapboxhq.com']
+                    ]
+                ]
+            ),
+            'https://localhost/poop'
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_complex_json_payload_correctly_when_encoded_with_flags()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => '0c3f0c81ba1fa3df9d3e0a1d72c4d491125153c0dea8355b6d48fe7ef1a4dacc',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(
+                [
+                    'users' => [
+                        ['id' => 1, 'name' => 'Chris Hayes', 'email' => 'hayes@soapboxhq.com'],
+                        ['id' => 2, 'name' => 'Jaspaul Bola', 'email' => 'jaspaul@soapboxhq.com'],
+                        ['id' => 3, 'name' => 'Mr Penã 💩', 'email' => 'Mr-Penã@soapboxhq.com']
+                    ]
+                ],
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            ),
+            'https://localhost/poop'
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_verifies_the_signature_of_a_complex_json_payload_after_stripping_the_trailing_slash()
+    {
+        $verifier = $this->makeSignedPostRequest(
+            '303103f5-3dca-4704-96ad-860717769ec9',
+            [
+                'HTTP_X-SIGNED-TIMESTAMP' => '2001-01-01 00:00:00',
+                'HTTP_Signature' => '0c3f0c81ba1fa3df9d3e0a1d72c4d491125153c0dea8355b6d48fe7ef1a4dacc',
+                'HTTP_Algorithm' => 'sha256'
+            ],
+            json_encode(
+                [
+                    'users' => [
+                        ['id' => 1, 'name' => 'Chris Hayes', 'email' => 'hayes@soapboxhq.com'],
+                        ['id' => 2, 'name' => 'Jaspaul Bola', 'email' => 'jaspaul@soapboxhq.com'],
+                        ['id' => 3, 'name' => 'Mr Penã 💩', 'email' => 'Mr-Penã@soapboxhq.com']
+                    ]
+                ]
+            ),
+            'https://localhost/poop/'
+        );
+
+        $verifier->setSignatureHeader('signature');
+        $verifier->setAlgorithmHeader('algorithm');
+
+        $this->assertTrue($verifier->isValid('key'));
+        $this->assertFalse($verifier->isValid('not_key'));
     }
 }

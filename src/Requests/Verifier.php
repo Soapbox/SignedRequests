@@ -142,7 +142,7 @@ class Verifier
         json_decode($content);
 
         if (json_last_error() == JSON_ERROR_NONE) {
-            return json_encode(json_decode($content), JSON_UNESCAPED_SLASHES);
+            return json_encode(json_decode($content), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
 
         return $content;
