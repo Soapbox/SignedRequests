@@ -284,7 +284,7 @@ class PayloadTest extends TestCase
             ->withHeader('X-SIGNED-ID', '303103f5-3dca-4704-96ad-860717769ec9')
             ->withHeader('X-SIGNED-TIMESTAMP', '2018-04-06 20:34:47');
 
-        $expected = '{"id":"303103f5-3dca-4704-96ad-860717769ec9","method":"GET","timestamp":"2018-04-06 20:34:47","uri":"https://localhost","content":"{\"url\":\"https:\\\\/\\\\/google.com\"}"}';
+        $expected = '{"id":"303103f5-3dca-4704-96ad-860717769ec9","method":"GET","timestamp":"2018-04-06 20:34:47","uri":"https://localhost","content":"{\"url\":\"https://google.com\"}"}';
 
         $this->assertEquals($expected, (string) new Payload($request));
     }

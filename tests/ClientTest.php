@@ -120,7 +120,7 @@ class ClientTest extends TestCase
                 $this->assertTrue($request->hasHeader('Algorithm'));
                 $this->assertTrue($request->hasHeader('Signature'));
                 $this->assertSame(
-                    'bf0f2eb48acf86cf72a87b48393f71fb2eebbb2c11fa0d838cbb127d74a0a00e',
+                    'd35d92484222fce7e5c194381e5f53342caae6fa626cd61e3431bddc549b34e1',
                     $request->getHeader('Signature')[0]
                 );
             });
@@ -143,7 +143,7 @@ class ClientTest extends TestCase
                 $this->assertTrue($request->hasHeader('Algorithm'));
                 $this->assertTrue($request->hasHeader('Signature'));
                 $this->assertSame(
-                    '10b165e59775d1a564be49046edd60137d40fcecebbdf59f41b01568ca07db63',
+                    '65ff94dce4894eb306a76ff0d397ec264b1c4980b57afbc3dd9526af242d239b',
                     $request->getHeader('Signature')[0]
                 );
             });
@@ -166,11 +166,79 @@ class ClientTest extends TestCase
                 $this->assertTrue($request->hasHeader('Algorithm'));
                 $this->assertTrue($request->hasHeader('Signature'));
                 $this->assertSame(
-                    '8c36d7384111d27336c410ebfec38c7da2eca9ec4779216f9cb8f921a08c4572',
+                    'ebd68bfe7ed51c050fb92db098946cd21b7b23be6f682360a5e893840a1dc52f',
                     $request->getHeader('Signature')[0]
                 );
             });
 
         $this->client->post($uri, ['json' => ['test' => $uri]]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_generates_a_signature_with_a_complex_json_payload()
+    {
+        Carbon::setTestNow('2001-01-01 00:00:00');
+        $this->expectUuid4('303103f5-3dca-4704-96ad-860717769ec9');
+
+        $uri = 'https://localhost/poop';
+
+        $this->handler->expects('POST', $uri)
+            ->inspectRequest(function ($request) use ($uri) {
+                $this->assertTrue($request->hasHeader('Algorithm'));
+                $this->assertTrue($request->hasHeader('Signature'));
+                $this->assertSame(
+                    '0c3f0c81ba1fa3df9d3e0a1d72c4d491125153c0dea8355b6d48fe7ef1a4dacc',
+                    $request->getHeader('Signature')[0]
+                );
+            });
+
+        $this->client->post(
+            $uri,
+            [
+                'json' => [
+                    'users' => [
+                        ['id' => 1, 'name' => 'Chris Hayes', 'email' => 'hayes@soapboxhq.com'],
+                        ['id' => 2, 'name' => 'Jaspaul Bola', 'email' => 'jaspaul@soapboxhq.com'],
+                        ['id' => 3, 'name' => 'Mr Penã 💩', 'email' => 'Mr-Penã@soapboxhq.com']
+                    ]
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_generates_a_signature_with_a_complex_json_payload_after_stripping_the_trailing_slash()
+    {
+        Carbon::setTestNow('2001-01-01 00:00:00');
+        $this->expectUuid4('303103f5-3dca-4704-96ad-860717769ec9');
+
+        $uri = 'https://localhost/poop/';
+
+        $this->handler->expects('POST', $uri)
+            ->inspectRequest(function ($request) use ($uri) {
+                $this->assertTrue($request->hasHeader('Algorithm'));
+                $this->assertTrue($request->hasHeader('Signature'));
+                $this->assertSame(
+                    '0c3f0c81ba1fa3df9d3e0a1d72c4d491125153c0dea8355b6d48fe7ef1a4dacc',
+                    $request->getHeader('Signature')[0]
+                );
+            });
+
+        $this->client->post(
+            $uri,
+            [
+                'json' => [
+                    'users' => [
+                        ['id' => 1, 'name' => 'Chris Hayes', 'email' => 'hayes@soapboxhq.com'],
+                        ['id' => 2, 'name' => 'Jaspaul Bola', 'email' => 'jaspaul@soapboxhq.com'],
+                        ['id' => 3, 'name' => 'Mr Penã 💩', 'email' => 'Mr-Penã@soapboxhq.com']
+                    ]
+                ]
+            ]
+        );
     }
 }

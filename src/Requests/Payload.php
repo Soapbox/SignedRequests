@@ -44,12 +44,27 @@ class Payload
         $timestamp = isset($this->request->getHeader('X-SIGNED-TIMESTAMP')[0]) ?
             $this->request->getHeader('X-SIGNED-TIMESTAMP')[0] : '';
 
+        $string = json_decode((string) $this->request->getBody());
+
+        if (is_null($string)) {
+            return json_encode([
+                'id' => (string)$id,
+                'method' => strtoupper($this->request->getMethod()),
+                'timestamp' => $timestamp,
+                'uri' => rtrim((string)$this->request->getUri(), '/'),
+                'content' => (string) $this->request->getBody()
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+
         return json_encode([
             'id' => (string) $id,
             'method' => strtoupper($this->request->getMethod()),
             'timestamp' => $timestamp,
-            'uri' => (string) $this->request->getUri(),
-            'content' => $this->request->getBody()->getContents()
+            'uri' => rtrim((string) $this->request->getUri(), '/'),
+            'content' => json_encode(
+                json_decode((string) $this->request->getBody()),
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            )
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
