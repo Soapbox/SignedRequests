@@ -29,6 +29,47 @@ class Payload
     }
 
     /**
+     * Generates a payload with the provided properties
+     *
+     * @param string $identifier
+     * @param string $method
+     * @param string $timestamp
+     * @param string $uri
+     * @param string $content
+     *
+     * @return string
+     */
+    private function generate(
+        string $identifier,
+        string $method,
+        string $timestamp,
+        string $uri,
+        string $content
+    ) : string {
+        $payload = [
+            'id' => $identifier,
+            'method' => strtoupper($method),
+            'timestamp' => $timestamp,
+            'uri' => rtrim($uri, '/')
+        ];
+
+        if (is_null(json_decode($content))) {
+            $payload = array_merge($payload, [
+                'content' => $content
+            ]);
+        } else {
+            $payload = array_merge($payload, [
+                'content' => json_encode(
+                    json_decode($content),
+                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                )
+            ]);
+        }
+
+        return json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
      * Returns the payload from a guzzle request.
      *
      * @param \Psr\Http\Message\RequestInterface $request
@@ -44,27 +85,13 @@ class Payload
         $timestamp = isset($this->request->getHeader('X-SIGNED-TIMESTAMP')[0]) ?
             $this->request->getHeader('X-SIGNED-TIMESTAMP')[0] : '';
 
-        $payload = [
-            'id' => (string) $id,
-            'method' => strtoupper($this->request->getMethod()),
-            'timestamp' => $timestamp,
-            'uri' => rtrim((string) $this->request->getUri(), '/')
-        ];
-
-        if (is_null(json_decode((string) $this->request->getBody()))) {
-            $payload = array_merge($payload, [
-                'content' => (string) $this->request->getBody()
-            ]);
-        } else {
-            $payload = array_merge($payload, [
-                'content' => json_encode(
-                    json_decode((string) $this->request->getBody()),
-                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                )
-            ]);
-        }
-
-        return json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return $this->generate(
+            (string) $id,
+            (string) $this->request->getMethod(),
+            (string) $timestamp,
+            (string) $this->request->getUri(),
+            (string) $this->request->getBody()
+        );
     }
 
     /**
@@ -81,27 +108,13 @@ class Payload
         $id = $this->request->headers->get('X-SIGNED-ID', '');
         $timestamp = $this->request->headers->get('X-SIGNED-TIMESTAMP', '');
 
-        $payload = [
-            'id' => (string) $id,
-            'method' => strtoupper($this->request->getMethod()),
-            'timestamp' => $timestamp,
-            'uri' => rtrim((string) $this->request->fullUrl(), '/'),
-        ];
-
-        if (is_null(json_decode((string) $this->request->getContent()))) {
-            $payload = array_merge($payload, [
-                'content' => (string) $this->request->getContent()
-            ]);
-        } else {
-            $payload = array_merge($payload, [
-                'content' => json_encode(
-                    json_decode((string)$this->request->getContent()),
-                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                )
-            ]);
-        }
-
-        return json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return $this->generate(
+            (string) $id,
+            (string) $this->request->getMethod(),
+            (string) $timestamp,
+            (string) $this->request->fullUrl(),
+            (string) $this->request->getContent()
+        );
     }
 
     /**
