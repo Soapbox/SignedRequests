@@ -47,7 +47,10 @@ class Generator
         $key = $this->configuration->getSigningKey();
 
         $request = $request->withHeader('X-SIGNED-ID', (string) Uuid::uuid4());
-        $request = $request->withHeader('X-SIGNED-TIMESTAMP', (string) Carbon::now());
+        $request = $request->withHeader(
+            'X-SIGNED-TIMESTAMP',
+            Carbon::now()->format('Y-m-d H:i:s')
+        );
 
         $signature = new Signature(new Payload($request), $algorithm, $key);
 
