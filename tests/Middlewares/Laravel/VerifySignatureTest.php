@@ -86,7 +86,8 @@ class VerifySignatureTest extends TestCase
 
         $request = new Request();
 
-        $this->middleware->handle($request, function () { });
+        $this->middleware->handle($request, function () {
+        });
     }
 
     /**
@@ -169,7 +170,8 @@ class VerifySignatureTest extends TestCase
         $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
         $request->headers->set('signature', (string) new Signature(new Payload($request), 'sha256', 'key'));
 
-        $this->middleware->handle($request, function () { });
+        $this->middleware->handle($request, function () {
+        });
     }
 
     /**
@@ -257,7 +259,8 @@ class VerifySignatureTest extends TestCase
         $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
         $request->headers->set('signature', (string) new Signature(new Payload($request), 'sha256', 'key'));
 
-        $this->middleware->handle($request, function () { });
+        $this->middleware->handle($request, function () {
+        });
     }
 
     /**
@@ -303,6 +306,49 @@ class VerifySignatureTest extends TestCase
             $this->assertTrue(true);
         });
 
-        $this->middleware->handle($request, function () { });
+        $this->middleware->handle($request, function () {
+        });
+    }
+
+    /**
+     * @test
+     * @expectedException \SoapBox\SignedRequests\Exceptions\ExpiredRequestException
+     */
+    public function it_throws_an_expired_request_exception_if_the_timestamp_on_the_request_does_not_have_the_correct_format()
+    {
+        $id = (string) Uuid::uuid4();
+
+        $this->configurations->shouldReceive('get')
+            ->with('signed-requests.headers.signature')
+            ->andReturn('signature');
+
+        $this->configurations->shouldReceive('get')
+            ->with('signed-requests.headers.algorithm')
+            ->andReturn('algorithm');
+
+        $this->configurations->shouldReceive('get')
+            ->with('signed-requests.key')
+            ->andReturn('key');
+
+        $this->configurations->shouldReceive('get')
+            ->with('signed-requests.request-replay.allow')
+            ->andReturn(false);
+
+        $query = [];
+        $request = [];
+        $attributes = [];
+        $cookies = [];
+        $files = [];
+        $server = [
+            'HTTP_X-SIGNED-ID' => $id,
+            'HTTP_X-SIGNED-TIMESTAMP' => Carbon::now()->addSeconds(10)->format('Y-m-d'),
+            'HTTP_ALGORITHM' => 'sha256'
+        ];
+
+        $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
+        $request->headers->set('signature', (string) new Signature(new Payload($request), 'sha256', 'key'));
+
+        $this->middleware->handle($request, function () {
+        });
     }
 }
