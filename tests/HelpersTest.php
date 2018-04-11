@@ -4,7 +4,6 @@ namespace Tests;
 
 use Carbon\Carbon;
 use SoapBox\SignedRequests\Helpers;
-use SoapBox\SignedRequests\Signature;
 
 class HelpersTest extends TestCase
 {
