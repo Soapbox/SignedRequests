@@ -4,6 +4,7 @@ namespace SoapBox\SignedRequests\Requests;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use SoapBox\SignedRequests\Helpers;
 use SoapBox\SignedRequests\Signature;
 
 class Verifier
@@ -185,10 +186,12 @@ class Verifier
      */
     public function isExpired(int $tolerance) : bool
     {
-        $issuedAt =
-            Carbon::parse($this->headers->get('X-SIGNED-TIMESTAMP', '1901-01-01 12:00:00'));
+        $timestamp = $this->headers->get('X-SIGNED-TIMESTAMP', '1901-01-01 12:00:00');
+        $issuedAt = Carbon::parse($timestamp);
 
-        return Carbon::now()->diffInSeconds($issuedAt) > $tolerance;
+        $isValid = Helpers::verifyDateTime($timestamp, 'Y-m-d H:i:s');
+
+        return !$isValid || Carbon::now()->diffInSeconds($issuedAt) > $tolerance;
     }
 
     /**
