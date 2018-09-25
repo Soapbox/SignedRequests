@@ -16,7 +16,7 @@ class InvalidConfigurationException extends Exception implements HttpExceptionIn
     const MESSAGE = 'Failed to find Signed Requests configuration key';
 
     /**
-     * Provides a default error message for an invalid signature.
+     * Provides a default error message for an invalid configuration.
      *
      * @param string $message
      *        A customizable error message.
@@ -27,10 +27,10 @@ class InvalidConfigurationException extends Exception implements HttpExceptionIn
     }
 
     /**
-     * Returns an HTTP BAD REQUEST status code.
+     * Returns an HTTP UNPROCESSABLE ENTITY status code.
      *
      * @return int
-     *         An HTTP BAD REQUEST response status code
+     *         An HTTP UNPROCESSABLE ENTITY response status code
      */
     public function getStatusCode()
     {
