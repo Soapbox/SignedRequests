@@ -46,11 +46,17 @@ class VerifySignatureTest extends TestCase
         $this->cache = new \Illuminate\Cache\Repository(new ArrayStore());
         $this->configurations = Mockery::mock(Configurations::class);
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.cache-prefix')
+            ->with('signed-requests.default.cache-prefix')
             ->andReturn('prefix');
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.tolerance')
+            ->with('signed-requests.default.request-replay.tolerance')
             ->andReturn(60);
+        $this->configurations->shouldReceive('get')
+            ->with('signed-requests')
+            ->andReturn([
+                'default' => [],
+                'custom' => []
+            ]);
         $this->middleware = new VerifySignature($this->configurations, $this->cache);
     }
 
@@ -69,19 +75,19 @@ class VerifySignatureTest extends TestCase
     public function it_throws_an_invalid_signature_exception_if_the_request_is_not_valid()
     {
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+            ->with('signed-requests.default.headers.signature')
             ->andReturn('HTTP_SIGNATURE');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+            ->with('signed-requests.default.headers.algorithm')
             ->andReturn('HTTP_ALGORITHM');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.key')
+            ->with('signed-requests.default.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.allow')
+            ->with('signed-requests.default.request-replay.allow')
             ->andReturn(true);
 
         $request = new Request();
@@ -98,19 +104,19 @@ class VerifySignatureTest extends TestCase
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+            ->with('signed-requests.default.headers.signature')
             ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+            ->with('signed-requests.default.headers.algorithm')
             ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.key')
+            ->with('signed-requests.default.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.allow')
+            ->with('signed-requests.default.request-replay.allow')
             ->andReturn(true);
 
         $query = [];
@@ -135,31 +141,31 @@ class VerifySignatureTest extends TestCase
     /**
      * @test
      */
-    public function it_should_prefix_the_configuration_keys_if_a_prefix_is_supplied()
+    public function it_should_set_the_key_when_one_is_passed()
     {
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
-            ->with('prefix-signed-requests.headers.signature')
+            ->with('signed-requests.custom.headers.signature')
             ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
-            ->with('prefix-signed-requests.headers.algorithm')
+            ->with('signed-requests.custom.headers.algorithm')
             ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
-            ->with('prefix-signed-requests.key')
+            ->with('signed-requests.custom.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('prefix-signed-requests.request-replay.allow')
+            ->with('signed-requests.custom.request-replay.allow')
             ->andReturn(true);
 
         $this->configurations->shouldReceive('get')
-            ->with('prefix-signed-requests.cache-prefix')
+            ->with('signed-requests.custom.cache-prefix')
             ->andReturn('prefix');
         $this->configurations->shouldReceive('get')
-            ->with('prefix-signed-requests.request-replay.tolerance')
+            ->with('signed-requests.custom.request-replay.tolerance')
             ->andReturn(60);
 
         $query = [];
@@ -178,7 +184,34 @@ class VerifySignatureTest extends TestCase
         $this->middleware->handle($request, function () {
             // This should be called.
             $this->assertTrue(true);
-        }, 'prefix');
+        }, 'custom');
+    }
+
+    /**
+     * @test
+     * @expectedException \SoapBox\SignedRequests\Exceptions\InvalidConfigurationException
+     */
+    public function it_should_throw_an_exception_when_it_cannot_find_the_key()
+    {
+        $id = (string) Uuid::uuid4();
+
+        $query = [];
+        $request = [];
+        $attributes = [];
+        $cookies = [];
+        $files = [];
+        $server = [
+            'HTTP_X-SIGNED-ID' => $id,
+            'HTTP_ALGORITHM' => 'sha256'
+        ];
+
+        $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
+        $request->headers->set('signature', (string) new Signature(new Payload($request), 'sha256', 'key'));
+
+        $this->middleware->handle($request, function () {
+            // This should be called.
+            $this->assertTrue(true);
+        }, 'nope');
     }
 
     /**
@@ -190,19 +223,19 @@ class VerifySignatureTest extends TestCase
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+            ->with('signed-requests.default.headers.signature')
             ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+            ->with('signed-requests.default.headers.algorithm')
             ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.key')
+            ->with('signed-requests.default.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.allow')
+            ->with('signed-requests.default.request-replay.allow')
             ->andReturn(false);
 
         $query = [];
@@ -231,19 +264,19 @@ class VerifySignatureTest extends TestCase
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+            ->with('signed-requests.default.headers.signature')
             ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+            ->with('signed-requests.default.headers.algorithm')
             ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.key')
+            ->with('signed-requests.default.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.allow')
+            ->with('signed-requests.default.request-replay.allow')
             ->andReturn(false);
 
         $query = [];
@@ -275,19 +308,19 @@ class VerifySignatureTest extends TestCase
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+            ->with('signed-requests.default.headers.signature')
             ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+            ->with('signed-requests.default.headers.algorithm')
             ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.key')
+            ->with('signed-requests.default.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.allow')
+            ->with('signed-requests.default.request-replay.allow')
             ->andReturn(false);
 
         $key = sprintf('prefix.%s', $id);
@@ -321,19 +354,19 @@ class VerifySignatureTest extends TestCase
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+            ->with('signed-requests.default.headers.signature')
             ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+            ->with('signed-requests.default.headers.algorithm')
             ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.key')
+            ->with('signed-requests.default.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.allow')
+            ->with('signed-requests.default.request-replay.allow')
             ->andReturn(false);
 
         $query = [];
@@ -368,19 +401,19 @@ class VerifySignatureTest extends TestCase
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.signature')
+            ->with('signed-requests.default.headers.signature')
             ->andReturn('signature');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.headers.algorithm')
+            ->with('signed-requests.default.headers.algorithm')
             ->andReturn('algorithm');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.key')
+            ->with('signed-requests.default.key')
             ->andReturn('key');
 
         $this->configurations->shouldReceive('get')
-            ->with('signed-requests.request-replay.allow')
+            ->with('signed-requests.default.request-replay.allow')
             ->andReturn(false);
 
         $query = [];
