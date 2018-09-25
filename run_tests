@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Any subsequent(*) commands which fail will cause the shell script to exit immediately
+set -e
+
+echo "################################################################################";
+echo "# Running Integration Tests:"
+echo "################################################################################";
+./vendor/bin/phpunit --configuration phpunit.xml --testsuite All
+echo "################################################################################";
+echo "";
