@@ -134,6 +134,55 @@ class VerifySignatureTest extends TestCase
 
     /**
      * @test
+     */
+    public function it_should_prefix_the_configuration_keys_if_a_prefix_is_supplied()
+    {
+        $id = (string) Uuid::uuid4();
+
+        $this->configurations->shouldReceive('get')
+            ->with('prefix-signed-requests.headers.signature')
+            ->andReturn('signature');
+
+        $this->configurations->shouldReceive('get')
+            ->with('prefix-signed-requests.headers.algorithm')
+            ->andReturn('algorithm');
+
+        $this->configurations->shouldReceive('get')
+            ->with('prefix-signed-requests.key')
+            ->andReturn('key');
+
+        $this->configurations->shouldReceive('get')
+            ->with('prefix-signed-requests.request-replay.allow')
+            ->andReturn(true);
+
+        $this->configurations->shouldReceive('get')
+            ->with('prefix-signed-requests.cache-prefix')
+            ->andReturn('prefix');
+        $this->configurations->shouldReceive('get')
+            ->with('prefix-signed-requests.request-replay.tolerance')
+            ->andReturn(60);
+
+        $query = [];
+        $request = [];
+        $attributes = [];
+        $cookies = [];
+        $files = [];
+        $server = [
+            'HTTP_X-SIGNED-ID' => $id,
+            'HTTP_ALGORITHM' => 'sha256'
+        ];
+
+        $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
+        $request->headers->set('signature', (string) new Signature(new Payload($request), 'sha256', 'key'));
+
+        $this->middleware->handle($request, function () {
+            // This should be called.
+            $this->assertTrue(true);
+        }, 'prefix');
+    }
+
+    /**
+     * @test
      * @expectedException \SoapBox\SignedRequests\Exceptions\ExpiredRequestException
      */
     public function it_throws_an_expired_request_exception_if_the_timestamp_on_the_request_is_outside_of_the_tolerance_allowed_for_requests()

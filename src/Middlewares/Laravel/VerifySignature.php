@@ -58,22 +58,27 @@ class VerifySignature
      *         An instance of the request.
      * @param  \Closure $next
      *         A callback function of where to go next.
+     * @param  mixed $prefix
      *
      * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, $prefix = '')
     {
+        if (!empty($prefix)) {
+            $prefix .= '-';
+        }
+
         $signed = new Verifier($request);
 
         $key = sprintf(
             '%s.%s',
-            $this->configurations->get('signed-requests.cache-prefix'),
+            $this->configurations->get($prefix . 'signed-requests.cache-prefix'),
             $signed->getId()
         );
 
-        $tolerance = $this->configurations->get('signed-requests.request-replay.tolerance');
+        $tolerance = $this->configurations->get($prefix . 'signed-requests.request-replay.tolerance');
 
-        if (true !== $this->configurations->get('signed-requests.request-replay.allow')) {
+        if (true !== $this->configurations->get($prefix . 'signed-requests.request-replay.allow')) {
             $isExpired = $signed->isExpired($tolerance);
 
             if ($isExpired || $this->cache->has($key)) {
@@ -82,10 +87,10 @@ class VerifySignature
         }
 
         $signed
-            ->setSignatureHeader($this->configurations->get('signed-requests.headers.signature'))
-            ->setAlgorithmHeader($this->configurations->get('signed-requests.headers.algorithm'));
+            ->setSignatureHeader($this->configurations->get($prefix . 'signed-requests.headers.signature'))
+            ->setAlgorithmHeader($this->configurations->get($prefix . 'signed-requests.headers.algorithm'));
 
-        if (!$signed->isValid($this->configurations->get('signed-requests.key'))) {
+        if (!$signed->isValid($this->configurations->get($prefix . 'signed-requests.key'))) {
             throw new InvalidSignatureException();
         }
 
