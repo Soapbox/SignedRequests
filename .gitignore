@@ -3,3 +3,4 @@ composer.lock
 .php_cs.cache
 coverage
 .DS_Store
+.idea
