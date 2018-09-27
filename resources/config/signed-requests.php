@@ -29,8 +29,8 @@ return [
         | look for the signature and algorithm respectively.
         */
         'headers' => [
-            'signature' => env('SIGNED_REQUEST_SIGNATURE_HEADER', 'GoodTalk-Signature'),
-            'algorithm' => env('SIGNED_REQUEST_ALGORITHM_HEADER', 'GoodTalk-Signature-Algorithm')
+            'signature' => env('SIGNED_REQUEST_SIGNATURE_HEADER', 'X-Signature'),
+            'algorithm' => env('SIGNED_REQUEST_ALGORITHM_HEADER', 'X-Signature-Algorithm')
         ],
 
         /*
@@ -62,8 +62,8 @@ return [
         'algorithm' => env('CUSTOM_SIGNED_REQUEST_ALGORITHM', 'sha256'),
         'cache-prefix' => env('CUSTOM_SIGNED_REQUEST_CACHE_PREFIX', 'signed-requests'),
         'headers' => [
-            'signature' => env('CUSTOM_SIGNED_REQUEST_SIGNATURE_HEADER', 'GoodTalk-Signature'),
-            'algorithm' => env('CUSTOM_SIGNED_REQUEST_ALGORITHM_HEADER', 'GoodTalk-Signature-Algorithm')
+            'signature' => env('CUSTOM_SIGNED_REQUEST_SIGNATURE_HEADER', 'X-Signature'),
+            'algorithm' => env('CUSTOM_SIGNED_REQUEST_ALGORITHM_HEADER', 'X-Signature-Algorithm')
         ],
         'key' => env('CUSTOM_SIGNED_REQUEST_KEY', 'key'),
         'request-replay' => [
