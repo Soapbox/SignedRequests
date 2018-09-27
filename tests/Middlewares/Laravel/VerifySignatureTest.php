@@ -181,10 +181,11 @@ class VerifySignatureTest extends TestCase
         $request = new Request($query, $request, $attributes, $cookies, $files, $server, 'a');
         $request->headers->set('signature', (string) new Signature(new Payload($request), 'sha256', 'key'));
 
-        $this->middleware->handle($request, function () {
-            // This should be called.
-            $this->assertTrue(true);
+        $called = false;
+        $this->middleware->handle($request, function () use (&$called) {
+            $called = true;
         }, 'custom');
+        $this->assertTrue($called);
     }
 
     /**
