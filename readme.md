@@ -72,6 +72,51 @@ Route::get('/fire', function () {
 })->middleware('verify-signature');
 ```
 
+### Setting Up Additional Keys
+
+You can also set up additional keys to use if you want different keys for different endpoints.
+
+Add them to your environment:
+
+```sh
+CUSTOM_SIGNED_REQUEST_ALGORITHM=
+CUSTOM_SIGNED_REQUEST_CACHE_PREFIX=
+CUSTOM_SIGNED_REQUEST_SIGNATURE_HEADER=
+CUSTOM_SIGNED_REQUEST_ALGORITHM_HEADER=
+CUSTOM_SIGNED_REQUEST_KEY=
+CUSTOM_SIGNED_REQUEST_ALLOW_REPLAYS=
+CUSTOM_SIGNED_REQUEST_TOLERANCE_SECONDS=
+```
+
+Update the configuration in `signed-requests.php`
+
+```php
+    'default' => [
+        ...
+    ],
+    'custom' => [
+        'algorithm' => env('CUSTOM_SIGNED_REQUEST_ALGORITHM', 'sha256'),
+        'cache-prefix' => env('CUSTOM_SIGNED_REQUEST_CACHE_PREFIX', 'signed-requests'),
+        'headers' => [
+            'signature' => env('CUSTOM_SIGNED_REQUEST_SIGNATURE_HEADER', 'X-Signature'),
+            'algorithm' => env('CUSTOM_SIGNED_REQUEST_ALGORITHM_HEADER', 'X-Signature-Algorithm')
+        ],
+        'key' => env('CUSTOM_SIGNED_REQUEST_KEY', 'key'),
+        'request-replay' => [
+            'allow' => env('CUSTOM_SIGNED_REQUEST_ALLOW_REPLAYS', false),
+            'tolerance' => env('CUSTOM_SIGNED_REQUEST_TOLERANCE_SECONDS', 30)
+        ]
+    ]
+```
+
+Set up your route to use the custom key. The param you pass must be the same name as the key you set in the configuration in `signed-requests.php`
+
+```php
+Route::get('/fire', function () {
+    return "You'll only see this if the signature of the request is valid!";
+})->middleware('verify-signature:custom');
+```
+
 ### Signing Postman Requests
 
 If you, like us, like to use [postman](https://www.getpostman.com/) to share your api internally you can use the following pre-request script to automatically sign your postman requests:
