@@ -87,8 +87,15 @@ function guid() {
     s4() + '-' + s4() + s4() + s4();
 }
 
+function getTimestamp() {
+    var date = (new Date()).toISOString();
+    date = date.split("T");
+    date[1] = date[1].split(".")[0];
+    return date.join(' ');
+}
+
 postman.setEnvironmentVariable("x-signed-id", guid());
-postman.setEnvironmentVariable("x-signed-timestamp", (new Date()).toUTCString());
+postman.setEnvironmentVariable("x-signed-timestamp", getTimestamp());
 postman.setEnvironmentVariable("x-algorithm", "sha256");
 
 var payload = {
@@ -96,13 +103,14 @@ var payload = {
     "method": request.method,
     "timestamp": postman.getEnvironmentVariable("x-signed-timestamp"),
     "uri": request.url.replace("{{url}}", postman.getEnvironmentVariable("url")),
-    "content": (Object.keys(request.data).length === 0) ? "" : request.data
+    "content": (Object.keys(request.data).length === 0) ? "" : JSON.stringify(JSON.parse(request.data))
 };
 
 var hash = CryptoJS.HmacSHA256(JSON.stringify(payload), postman.getEnvironmentVariable("key"));
 var signature = hash.toString();
 
 postman.setEnvironmentVariable("x-signature", signature);
+
 ```
 
 Note for this to work you'll have to setup your environment to have the following variables:
