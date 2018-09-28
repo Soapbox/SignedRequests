@@ -72,6 +72,51 @@ Route::get('/fire', function () {
 })->middleware('verify-signature');
 ```
 
+### Setting Up Additional Keys
+
+You can also set up additional keys to use if you want different keys for different endpoints.
+
+Add them to your environment:
+
+```sh
+CUSTOM_SIGNED_REQUEST_ALGORITHM=
+CUSTOM_SIGNED_REQUEST_CACHE_PREFIX=
+CUSTOM_SIGNED_REQUEST_SIGNATURE_HEADER=
+CUSTOM_SIGNED_REQUEST_ALGORITHM_HEADER=
+CUSTOM_SIGNED_REQUEST_KEY=
+CUSTOM_SIGNED_REQUEST_ALLOW_REPLAYS=
+CUSTOM_SIGNED_REQUEST_TOLERANCE_SECONDS=
+```
+
+Update the configuration in `signed-requests.php`
+
+```php
+    'default' => [
+        ...
+    ],
+    'custom' => [
+        'algorithm' => env('CUSTOM_SIGNED_REQUEST_ALGORITHM', 'sha256'),
+        'cache-prefix' => env('CUSTOM_SIGNED_REQUEST_CACHE_PREFIX', 'signed-requests'),
+        'headers' => [
+            'signature' => env('CUSTOM_SIGNED_REQUEST_SIGNATURE_HEADER', 'X-Signature'),
+            'algorithm' => env('CUSTOM_SIGNED_REQUEST_ALGORITHM_HEADER', 'X-Signature-Algorithm')
+        ],
+        'key' => env('CUSTOM_SIGNED_REQUEST_KEY', 'key'),
+        'request-replay' => [
+            'allow' => env('CUSTOM_SIGNED_REQUEST_ALLOW_REPLAYS', false),
+            'tolerance' => env('CUSTOM_SIGNED_REQUEST_TOLERANCE_SECONDS', 30)
+        ]
+    ]
+```
+
+Set up your route to use the custom key. The param you pass must be the same name as the key you set in the configuration in `signed-requests.php`
+
+```php
+Route::get('/fire', function () {
+    return "You'll only see this if the signature of the request is valid!";
+})->middleware('verify-signature:custom');
+```
+
 ### Signing Postman Requests
 
 If you, like us, like to use [postman](https://www.getpostman.com/) to share your api internally you can use the following pre-request script to automatically sign your postman requests:
@@ -87,8 +132,15 @@ function guid() {
     s4() + '-' + s4() + s4() + s4();
 }
 
+function getTimestamp() {
+    var date = (new Date()).toISOString();
+    date = date.split("T");
+    date[1] = date[1].split(".")[0];
+    return date.join(' ');
+}
+
 postman.setEnvironmentVariable("x-signed-id", guid());
-postman.setEnvironmentVariable("x-signed-timestamp", (new Date()).toUTCString());
+postman.setEnvironmentVariable("x-signed-timestamp", getTimestamp());
 postman.setEnvironmentVariable("x-algorithm", "sha256");
 
 var payload = {
@@ -96,13 +148,14 @@ var payload = {
     "method": request.method,
     "timestamp": postman.getEnvironmentVariable("x-signed-timestamp"),
     "uri": request.url.replace("{{url}}", postman.getEnvironmentVariable("url")),
-    "content": (Object.keys(request.data).length === 0) ? "" : request.data
+    "content": (Object.keys(request.data).length === 0) ? "" : JSON.stringify(JSON.parse(request.data))
 };
 
 var hash = CryptoJS.HmacSHA256(JSON.stringify(payload), postman.getEnvironmentVariable("key"));
 var signature = hash.toString();
 
 postman.setEnvironmentVariable("x-signature", signature);
+
 ```
 
 Note for this to work you'll have to setup your environment to have the following variables:

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Configurations;
 use SoapBox\SignedRequests\Exceptions\ExpiredRequestException;
 use SoapBox\SignedRequests\Exceptions\InvalidSignatureException;
+use SoapBox\SignedRequests\Exceptions\InvalidConfigurationException;
 
 class VerifySignature
 {
@@ -53,27 +54,34 @@ class VerifySignature
      *         Thrown if request replays are disabled and either the request
      *         timestamp is outside the window of tolerance, or the request has
      *         previously been served.
+     * @throws \SoapBox\SignedRequests\Exceptions\InvalidConfigurationException
+     *         Thrown if the request key is not defined in the config
      *
      * @param  \Illuminate\Http\Request $request
      *         An instance of the request.
      * @param  \Closure $next
      *         A callback function of where to go next.
+     * @param  mixed $requestKey
      *
      * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, $requestKey = 'default')
     {
+        if (!array_key_exists($requestKey, $this->configurations->get('signed-requests'))) {
+            throw new InvalidConfigurationException();
+        }
+
         $signed = new Verifier($request);
 
         $key = sprintf(
             '%s.%s',
-            $this->configurations->get('signed-requests.cache-prefix'),
+            $this->configurations->get("signed-requests.$requestKey.cache-prefix"),
             $signed->getId()
         );
 
-        $tolerance = $this->configurations->get('signed-requests.request-replay.tolerance');
+        $tolerance = $this->configurations->get("signed-requests.$requestKey.request-replay.tolerance");
 
-        if (true !== $this->configurations->get('signed-requests.request-replay.allow')) {
+        if (true !== $this->configurations->get("signed-requests.$requestKey.request-replay.allow")) {
             $isExpired = $signed->isExpired($tolerance);
 
             if ($isExpired || $this->cache->has($key)) {
@@ -82,10 +90,10 @@ class VerifySignature
         }
 
         $signed
-            ->setSignatureHeader($this->configurations->get('signed-requests.headers.signature'))
-            ->setAlgorithmHeader($this->configurations->get('signed-requests.headers.algorithm'));
+            ->setSignatureHeader($this->configurations->get("signed-requests.$requestKey.headers.signature"))
+            ->setAlgorithmHeader($this->configurations->get("signed-requests.$requestKey.headers.algorithm"));
 
-        if (!$signed->isValid($this->configurations->get('signed-requests.key'))) {
+        if (!$signed->isValid($this->configurations->get("signed-requests.$requestKey.key"))) {
             throw new InvalidSignatureException();
         }
 
