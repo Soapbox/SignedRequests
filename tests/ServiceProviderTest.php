@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as Base;
 use SoapBox\SignedRequests\ServiceProvider;
 
@@ -20,8 +21,8 @@ class ServiceProviderTest extends Base
         $this->assertNotEmpty($publishes);
 
         foreach ($publishes as $key => $value) {
-            $this->assertTrue(ends_with($key, 'signed-requests.php'));
-            $this->assertTrue(ends_with($value, 'signed-requests.php'));
+            $this->assertTrue(Str::endsWith($key, 'signed-requests.php'));
+            $this->assertTrue(Str::endsWith($value, 'signed-requests.php'));
         }
     }
 }
