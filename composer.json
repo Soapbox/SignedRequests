@@ -26,7 +26,7 @@
     },
     "require-dev": {
         "jshayes/fake-requests": "dev-master",
-        "mockery/mockery": "^1.4",
+        "mockery/mockery": "^1.0",
         "orchestra/testbench": "^5.0",
         "phpunit/phpunit": "^8.0",
         "php-coveralls/php-coveralls": "^2.0"
