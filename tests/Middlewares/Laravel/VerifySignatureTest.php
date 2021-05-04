@@ -13,6 +13,9 @@ use SoapBox\SignedRequests\Requests\Signed;
 use SoapBox\SignedRequests\Requests\Payload;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Configurations;
+use SoapBox\SignedRequests\Exceptions\ExpiredRequestException;
+use SoapBox\SignedRequests\Exceptions\InvalidConfigurationException;
+use SoapBox\SignedRequests\Exceptions\InvalidSignatureException;
 use SoapBox\SignedRequests\Middlewares\Laravel\VerifySignature;
 
 class VerifySignatureTest extends TestCase
@@ -70,10 +73,11 @@ class VerifySignatureTest extends TestCase
 
     /**
      * @test
-     * @expectedException \SoapBox\SignedRequests\Exceptions\InvalidSignatureException
      */
     public function it_throws_an_invalid_signature_exception_if_the_request_is_not_valid()
     {
+        $this->expectException(InvalidSignatureException::class);
+
         $this->configurations->shouldReceive('get')
             ->with('signed-requests.default.headers.signature')
             ->andReturn('HTTP_SIGNATURE');
@@ -190,10 +194,11 @@ class VerifySignatureTest extends TestCase
 
     /**
      * @test
-     * @expectedException \SoapBox\SignedRequests\Exceptions\InvalidConfigurationException
      */
     public function it_should_throw_an_exception_when_it_cannot_find_the_key()
     {
+        $this->expectException(InvalidConfigurationException::class);
+
         $id = (string) Uuid::uuid4();
 
         $query = [];
@@ -217,10 +222,11 @@ class VerifySignatureTest extends TestCase
 
     /**
      * @test
-     * @expectedException \SoapBox\SignedRequests\Exceptions\ExpiredRequestException
      */
     public function it_throws_an_expired_request_exception_if_the_timestamp_on_the_request_is_outside_of_the_tolerance_allowed_for_requests()
     {
+        $this->expectException(ExpiredRequestException::class);
+
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
@@ -302,10 +308,11 @@ class VerifySignatureTest extends TestCase
 
     /**
      * @test
-     * @expectedException \SoapBox\SignedRequests\Exceptions\ExpiredRequestException
      */
     public function it_should_throw_an_expired_request_exception_if_the_request_id_has_previously_been_seen()
     {
+        $this->expectException(ExpiredRequestException::class);
+
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
@@ -348,10 +355,11 @@ class VerifySignatureTest extends TestCase
 
     /**
      * @test
-     * @expectedException \SoapBox\SignedRequests\Exceptions\ExpiredRequestException
      */
     public function it_should_throw_an_expired_request_exception_if_the_same_request_is_played_multiple_times()
     {
+        $this->expectException(ExpiredRequestException::class);
+
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
@@ -395,10 +403,11 @@ class VerifySignatureTest extends TestCase
 
     /**
      * @test
-     * @expectedException \SoapBox\SignedRequests\Exceptions\ExpiredRequestException
      */
     public function it_throws_an_expired_request_exception_if_the_timestamp_on_the_request_does_not_have_the_correct_format()
     {
+        $this->expectException(ExpiredRequestException::class);
+
         $id = (string) Uuid::uuid4();
 
         $this->configurations->shouldReceive('get')
