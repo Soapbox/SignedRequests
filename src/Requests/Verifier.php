@@ -161,11 +161,11 @@ class Verifier
      */
     public function isValid(string $key) : bool
     {
-        if (!$this->headers->has($this->algorithmHeader)) {
+        if (!$this->algorithmHeader || !$this->headers->has($this->algorithmHeader)) {
             return false;
         }
 
-        if (!$this->headers->has($this->signatureHeader)) {
+        if (!$this->signatureHeader || !$this->headers->has($this->signatureHeader)) {
             return false;
         }
 
