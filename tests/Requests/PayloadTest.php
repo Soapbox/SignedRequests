@@ -20,7 +20,7 @@ class PayloadTest extends TestCase
 
         $method = 'GET';
         $uri = 'https://localhost';
-        $id = Uuid::uuid4();
+        $id = (string) Uuid::uuid4();
 
         $request = (new GuzzleRequest('GET', 'https://localhost'))
             ->withHeader('X-SIGNED-ID', $id)
@@ -46,7 +46,7 @@ class PayloadTest extends TestCase
 
         $method = 'GET';
         $uri = 'https://localhost';
-        $id = Uuid::uuid4();
+        $id = (string) Uuid::uuid4();
 
         $request = (new GuzzleRequest('GET', 'https://localhost', [], 'content'))
             ->withHeader('X-SIGNED-ID', $id)
@@ -152,7 +152,7 @@ class PayloadTest extends TestCase
         $now = (string)Carbon::now();
 
         $uri = 'https://localhost';
-        $id = Uuid::uuid4();
+        $id = (string)Uuid::uuid4();
 
         $request = (new GuzzleRequest('get', 'https://localhost', [], 'content'))
             ->withHeader('X-SIGNED-ID', $id)
