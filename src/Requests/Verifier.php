@@ -26,7 +26,7 @@ class Verifier
     /**
      * The underlying request that has the signature to validate.
      *
-     * @var \Illluminate\Http\Request
+     * @var \Illuminate\Http\Request
      */
     protected $request;
 

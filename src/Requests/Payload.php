@@ -95,7 +95,7 @@ class Payload
     }
 
     /**
-     * Retruns the payload from an illuminate request.
+     * Returns the payload from an illuminate request.
      *
      * @param \Illuminate\Http\Request $request
      *        An instance of the illuminate request to extract the payload from.
