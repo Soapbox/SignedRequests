@@ -10,7 +10,7 @@ class CustomConfigurationTest extends TestCase
     /**
      * @test
      */
-    function it_returns_the_set_values_when_requested()
+    public function it_returns_the_set_values_when_requested()
     {
         $algorithmHeader = 'a';
         $signatureHeader = 's';

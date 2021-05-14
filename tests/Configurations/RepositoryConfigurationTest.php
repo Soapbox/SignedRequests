@@ -15,7 +15,7 @@ class RepositoryConfigurationTest extends TestCase
     /**
      * @before
      */
-    function setup_repository()
+    public function setup_repository()
     {
         $this->repository = Mockery::mock(Repository::class);
         $this->configuration = new RepositoryConfiguration($this->repository);
@@ -24,7 +24,7 @@ class RepositoryConfigurationTest extends TestCase
     /**
      * @test
      */
-    function get_algorithm_header_returns_the_algorithm_header_value_from_the_configuration_repository()
+    public function get_algorithm_header_returns_the_algorithm_header_value_from_the_configuration_repository()
     {
         $this->repository->shouldReceive('get')
             ->with('signed-requests.headers.algorithm')
@@ -36,7 +36,7 @@ class RepositoryConfigurationTest extends TestCase
     /**
      * @test
      */
-    function get_signature_header_returns_the_signature_header_value_from_the_configuration_repository()
+    public function get_signature_header_returns_the_signature_header_value_from_the_configuration_repository()
     {
         $this->repository->shouldReceive('get')
             ->with('signed-requests.headers.signature')
@@ -48,7 +48,7 @@ class RepositoryConfigurationTest extends TestCase
     /**
      * @test
      */
-    function get_signing_algorithm_returns_the_signing_algorithm_to_use_from_the_configuration_repository()
+    public function get_signing_algorithm_returns_the_signing_algorithm_to_use_from_the_configuration_repository()
     {
         $this->repository->shouldReceive('get')
             ->with('signed-requests.algorithm')
@@ -60,7 +60,7 @@ class RepositoryConfigurationTest extends TestCase
     /**
      * @test
      */
-    function get_signing_key_returns_the_key_used_for_signing_the_request_from_the_configuration_repository()
+    public function get_signing_key_returns_the_key_used_for_signing_the_request_from_the_configuration_repository()
     {
         $this->repository->shouldReceive('get')
             ->with('signed-requests.key')

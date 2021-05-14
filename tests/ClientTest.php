@@ -4,8 +4,9 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\UuidInterface;
 use JSHayes\FakeRequests\MockHandler;
-use Ramsey\Uuid\UuidFactoryInterface;
 use JSHayes\FakeRequests\ClientFactory;
 use SoapBox\SignedRequests\Configurations\CustomConfiguration;
 use SoapBox\SignedRequests\Middlewares\Guzzle\GenerateSignature;
@@ -14,45 +15,27 @@ class ClientTest extends TestCase
 {
     private function expectUuid4(string $uuid): void
     {
-        Uuid::setFactory(new class($uuid) implements UuidFactoryInterface {
-            public function __construct(string $uuid)
+        Uuid::setFactory(new class($uuid) extends UuidFactory {
+            public function __construct($uuid)
             {
-                $this->uuid = $uuid;
+                $this->customUuid = $uuid;
+
+                parent::__construct();
             }
 
-            public function uuid1($node = null, $clockSeq = null)
+            public function uuid4(): UuidInterface
             {
-                return null;
-            }
+                return new class($this->customUuid) extends Uuid {
+                    public function __construct($uuid)
+                    {
+                        $this->customUuid = $uuid;
+                    }
 
-            public function uuid3($ns, $name)
-            {
-                return null;
-            }
-
-            public function uuid4()
-            {
-                return $this->uuid;
-            }
-
-            public function uuid5($ns, $name)
-            {
-                return null;
-            }
-
-            public function fromBytes($bytes)
-            {
-                return null;
-            }
-
-            public function fromString($uuid)
-            {
-                return null;
-            }
-
-            public function fromInteger($integer)
-            {
-                return null;
+                    public function toString(): string
+                    {
+                        return $this->customUuid;
+                    }
+                };
             }
         });
     }
