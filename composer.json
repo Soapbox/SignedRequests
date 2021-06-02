@@ -25,7 +25,7 @@
         "ramsey/uuid": "^4.0"
     },
     "require-dev": {
-        "jshayes/fake-requests": "dev-master",
+        "jshayes/fake-requests": "^5.0",
         "mockery/mockery": "^1.4",
         "orchestra/testbench": "^6.3",
         "phpunit/phpunit": "^9.3",
