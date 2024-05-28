@@ -1,0 +1,33 @@
+# PHP CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-php/ for more details
+#
+version: 2.1
+
+commands:
+  build:
+    steps:
+      - checkout
+      - run: sudo apt update
+      - run:
+          name: Composer Install
+          command: |
+            composer install -n --prefer-dist --no-scripts
+      - run:
+          name: Run Tests
+          command: |
+            ./vendor/bin/phpunit
+
+jobs:
+  php81:
+    docker:
+      - image: cimg/php:8.1
+    resource_class: small
+    steps:
+      - build
+
+workflows:
+  version: 2
+  signed-requests:
+    jobs:
+      - php81
