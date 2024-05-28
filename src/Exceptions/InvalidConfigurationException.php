@@ -32,7 +32,7 @@ class InvalidConfigurationException extends Exception implements HttpExceptionIn
      * @return int
      *         An HTTP UNPROCESSABLE ENTITY response status code
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return Response::HTTP_UNPROCESSABLE_ENTITY;
     }
@@ -43,7 +43,7 @@ class InvalidConfigurationException extends Exception implements HttpExceptionIn
      * @return array
      *         Response headers
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return [];
     }
