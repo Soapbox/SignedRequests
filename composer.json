@@ -18,15 +18,15 @@
     "require": {
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.8.1",
-        "illuminate/http": "^10",
-        "illuminate/support": "^10",
+        "illuminate/http": "^9",
+        "illuminate/support": "^9",
         "ramsey/uuid": "^4.7.6"
     },
     "require-dev": {
         "jshayes/fake-requests": "dev-php81",
         "mockery/mockery": "^1.6.12",
-        "orchestra/testbench": "^8.23.0",
-        "phpunit/phpunit": "^10.5.20"
+        "orchestra/testbench": "^7.42.0",
+        "phpunit/phpunit": "^9"
     },
     "autoload": {
         "psr-4": {
