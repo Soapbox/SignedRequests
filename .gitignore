@@ -1,6 +1,7 @@
 vendor
-composer.lock
 .php_cs.cache
 coverage
 .DS_Store
 .idea
+.phpunit.cache/
+.phpunit.result.cache

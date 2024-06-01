@@ -32,7 +32,7 @@ class InvalidSignatureException extends Exception implements HttpExceptionInterf
      * @return int
      *         An HTTP BAD REQUEST response status code
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return Response::HTTP_BAD_REQUEST;
     }
@@ -43,7 +43,7 @@ class InvalidSignatureException extends Exception implements HttpExceptionInterf
      * @return array
      *         Response headers
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return [];
     }
